@@ -29,7 +29,7 @@ export default function HomePage() {
   const premiumCategories = [
     { 
       name: "Luxury Watches", 
-      img: "/placeholder.svg", 
+      img: "/asset-watch.png", 
       href: "/assets-we-fund#watches",
       maxFunding: "$25,000",
       maxBuyback: "$27,500",
@@ -38,7 +38,7 @@ export default function HomePage() {
     },
     { 
       name: "Fine Jewelry", 
-      img: "/placeholder.svg", 
+      img: "/asset-jewelry.png", 
       href: "/assets-we-fund#jewelry",
       maxFunding: "$15,000",
       maxBuyback: "$16,500", 
@@ -47,7 +47,7 @@ export default function HomePage() {
     },
     { 
       name: "Designer Handbags", 
-      img: "/placeholder.svg", 
+      img: "/asset-handbag.png", 
       href: "/assets-we-fund#handbags",
       maxFunding: "$10,000",
       maxBuyback: "$11,000",
@@ -56,7 +56,7 @@ export default function HomePage() {
     },
     { 
       name: "Premium Electronics", 
-      img: "/placeholder.svg", 
+      img: "/asset-electronics.png", 
       href: "/assets-we-fund#electronics",
       maxFunding: "$5,000",
       maxBuyback: "$5,500",
@@ -65,7 +65,7 @@ export default function HomePage() {
     },
     { 
       name: "Musical Instruments", 
-      img: "/placeholder.svg", 
+      img: "/asset-instrument.png", 
       href: "/assets-we-fund#instruments",
       maxFunding: "$8,000",
       maxBuyback: "$8,800",
@@ -74,7 +74,7 @@ export default function HomePage() {
     },
     { 
       name: "Photography Equipment", 
-      img: "/placeholder.svg", 
+      img: "/asset-camera.png", 
       href: "/assets-we-fund#cameras",
       maxFunding: "$7,500",
       maxBuyback: "$8,250",
@@ -88,6 +88,7 @@ export default function HomePage() {
       number: "01",
       title: "Asset Evaluation & Purchase Offer",
       description: "We evaluate your item and make a cash purchase offer. This is a complete sale transaction, not a loan.",
+      image: "/process-step1.png",
       icon: Camera,
       legal: "Bill of Sale executed upon acceptance"
     },
@@ -95,6 +96,7 @@ export default function HomePage() {
       number: "02", 
       title: "Secure Transfer & Payment",
       description: "We purchase your item with full title transfer and immediate cash payment via wire transfer.",
+      image: "/process-step2.png",
       icon: Shield,
       legal: "Full legal and equitable title transferred"
     },
@@ -102,6 +104,7 @@ export default function HomePage() {
       number: "03",
       title: "Professional Storage & Insurance", 
       description: "Your formerly-owned item is stored in our insured facility. We assume all market risk and ownership.",
+      image: "/process-step3.png",
       icon: Eye,
       legal: "Vaultly assumes 100% ownership and market risk"
     },
@@ -109,6 +112,7 @@ export default function HomePage() {
       number: "04",
       title: "Optional Repurchase Rights",
       description: "You have the exclusive option (not obligation) to repurchase your former item at a fixed price within 90 days.",
+      image: "/process-funding.png", 
       icon: Zap,
       legal: "Repurchase option expires automatically - no personal liability"
     }
@@ -135,33 +139,26 @@ export default function HomePage() {
     { code: "NV", name: "Nevada", status: "Limited" }
   ]
 
-  const stats = [
-    { number: "$50M+", label: "Assets Purchased", icon: DollarSign },
-    { number: "24hrs", label: "Average Purchase Time", icon: Clock },
-    { number: "85%", label: "Repurchase Rate", icon: TrendingUp },
-    { number: "15K+", label: "Satisfied Sellers", icon: Users },
-  ]
-
   const testimonials = [
     {
-      name: "Sarah Chen",
+      name: "Sarah C.",
       role: "Business Owner, Austin TX",
       image: "/testimonial-sarah.png",
-      quote: "Vaultly purchased my Rolex for $15,000 cash. I was able to repurchase it 60 days later for $16,500. Clean, simple sale and repurchase.",
+      quote: "Professional service and fair valuation. The process was transparent and exactly as described.",
       rating: 5,
-      saleAmount: "$15,000",
-      repurchaseAmount: "$16,500",
-      item: "Rolex Submariner"
+      saleAmount: "$8,500",
+      repurchaseAmount: "$9,350",
+      item: "Designer Watch"
     },
     {
-      name: "David Rodriguez", 
+      name: "David R.", 
       role: "Entrepreneur, Miami FL",
       image: "/testimonial-david.png",
-      quote: "Sold my art collection to Vaultly for $25,000 with a 90-day repurchase option at $27,500. Got the capital I needed for my business.",
+      quote: "Quick process with clear terms. Got the funding I needed and understood exactly what I was agreeing to.",
       rating: 5,
-      saleAmount: "$25,000",
-      repurchaseAmount: "$27,500", 
-      item: "Art Collection"
+      saleAmount: "$12,000",
+      repurchaseAmount: "$13,200", 
+      item: "Camera Equipment"
     }
   ]
 
@@ -243,7 +240,7 @@ export default function HomePage() {
             <div className="relative">
               <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-900 to-gray-800">
                 <Image
-                  src="/placeholder.svg"
+                  src="/hero-flatlay.png"
                   alt="Luxury assets available for purchase including watches, jewelry and electronics"
                   fill
                   className="object-cover"
@@ -351,27 +348,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-20">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="bg-white/20 p-4 rounded-full">
-                    <stat.icon className="w-8 h-8 text-white" />
-                  </div>
-                </div>
-                <div className="text-4xl md:text-5xl font-bold mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-green-100 text-sm md:text-base font-medium">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Legal Process Section */}
       <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto">
@@ -400,6 +376,14 @@ export default function HomePage() {
                   </CardDescription>
                   <div className="bg-green-50 p-3 rounded-lg mb-6">
                     <p className="text-xs text-green-800 font-medium">{step.legal}</p>
+                  </div>
+                  <div className="h-48 relative rounded-xl overflow-hidden shadow-md">
+                    <Image
+                      src={step.image}
+                      alt={step.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -479,10 +463,10 @@ export default function HomePage() {
       <section className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-24">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-5xl md:text-6xl font-bold mb-6">
+            <h2 className="font-serif text-5xl md:text-6xl font-bold mb-6 text-white">
               Client Success Stories
             </h2>
-            <p className="text-xl text-gray-300">Real transactions, real results, full transparency</p>
+            <p className="text-xl text-gray-300">Real transactions, honest feedback, transparent results</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
@@ -511,7 +495,7 @@ export default function HomePage() {
                   
                   <div className="text-center mb-6">
                     <div className="text-amber-400 font-semibold text-lg">{testimonial.item}</div>
-                    <div className="text-gray-400 text-sm">Asset Purchased & Repurchased</div>
+                    <div className="text-gray-400 text-sm">Asset Transacted</div>
                   </div>
                   
                   <div className="flex items-center space-x-4">
