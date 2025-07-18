@@ -23,10 +23,8 @@ import {
   FileText,
   AlertTriangle,
   MapPin,
-  Lightning,
   CreditCard,
-  Heart,
-  ThumbsUp
+  Heart
 } from "lucide-react"
 
 export default function HomePage() {
@@ -100,7 +98,7 @@ export default function HomePage() {
       title: "Get Paid Fast",
       description: "Accept your offer and receive cash in your account within 24 hours.",
       image: "/process-step2.png",
-      icon: Lightning
+      icon: Zap
     },
     {
       number: "03",
@@ -150,7 +148,7 @@ export default function HomePage() {
             <div className="flex flex-col items-start space-y-8">
               <div className="flex items-center space-x-3">
                 <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 text-sm font-semibold animate-pulse">
-                  <Lightning className="w-4 h-4 mr-2" />
+                  <Zap className="w-4 h-4 mr-2" />
                   Get Cash in 24 Hours
                 </Badge>
                 <Badge variant="outline" className="border-orange-500 text-orange-700 px-3 py-1">
