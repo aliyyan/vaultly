@@ -34,16 +34,35 @@ export default function LegalAgreementPage() {
 
   const handleSubmit = async () => {
     if (sigRef.current && !sigRef.current.isEmpty()) {
-      const signatureData = sigRef.current.toDataURL()
-      
-      const completeData = {
-        ...formData,
-        signature: signatureData
+      try {
+        const signatureData = sigRef.current.toDataURL()
+        
+        const completeData = {
+          ...formData,
+          signature: signatureData
+        }
+        
+        const response = await fetch('/api/legal-agreement/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(completeData),
+        })
+
+        const result = await response.json()
+
+        if (response.ok) {
+          alert('Legal agreement signed and saved successfully!')
+          // You could redirect to a success page here
+          // window.location.href = '/apply/agreement-complete'
+        } else {
+          alert(`Error: ${result.error}`)
+        }
+      } catch (error) {
+        console.error('Submission error:', error)
+        alert('Failed to submit agreement. Please try again.')
       }
-      
-      console.log('Form submitted:', completeData)
-      // Here you would typically send to your API
-      alert('Legal agreement signed successfully!')
     } else {
       alert('Please provide your digital signature before submitting.')
     }
