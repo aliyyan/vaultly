@@ -86,6 +86,13 @@ export default function ApplyPage() {
       buybackAmount: "$8,250",
       examples: "Canon, Nikon, Leica, professional lenses",
       icon: "📷"
+    },
+    {
+      category: "Other",
+      maxFunding: "$10,000",
+      buybackAmount: "$11,000",
+      examples: "Art, collectibles, antiques, sports memorabilia",
+      icon: "🎨"
     }
   ]
 

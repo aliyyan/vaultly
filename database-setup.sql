@@ -84,7 +84,8 @@ INSERT INTO asset_categories (name, max_funding_amount, description) VALUES
 ('Electronics', 5000.00, 'Cameras, phones, laptops, gaming equipment'),
 ('Designer Handbags', 8000.00, 'Louis Vuitton, Chanel, Hermès'),
 ('Art & Collectibles', 20000.00, 'Paintings, sculptures, rare collectibles'),
-('Musical Instruments', 10000.00, 'Guitars, violins, professional equipment')
+('Musical Instruments', 10000.00, 'Guitars, violins, professional equipment'),
+('Other', 10000.00, 'Art, collectibles, antiques, sports memorabilia')
 ON CONFLICT (name) DO NOTHING;
 
 -- 7. Enable Row Level Security (RLS)
