@@ -104,7 +104,7 @@ export default function HomePage() {
       number: "03",
       title: "Keep Your Options Open", 
       description: "Your item is safely stored. Buy it back anytime within 90 days if you want.",
-      image: "/process-step3.png",
+      image: "/buyback-image.png",
       icon: Heart
     }
   ]
