@@ -115,6 +115,18 @@ export default function ApplyPage() {
 
   const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate all checkboxes are checked
+    if (!formData.saleAcknowledgment || 
+        !formData.noLiabilityAcknowledgment || 
+        !formData.marketRiskAcknowledgment || 
+        !formData.kycConsent || 
+        !formData.termsAgreement) {
+      setSubmitError("Please check all required acknowledgments before continuing.")
+      return
+    }
+    
+    setSubmitError("") // Clear any previous errors
     setStep(3) // Go to legal document step
   }
 
@@ -384,7 +396,12 @@ export default function ApplyPage() {
             </Card>
 
             {/* Submit Button */}
-            <div className="text-center">
+            <div className="text-center space-y-4">
+              {submitError && (
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                  {submitError}
+                </div>
+              )}
               <Button
                 type="submit"
                 size="lg"
@@ -448,6 +465,11 @@ export default function ApplyPage() {
                 <CardTitle className="text-white">Required Legal Acknowledgments</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
+                  <p className="text-red-800 text-sm font-medium">
+                    <span className="text-red-500">*</span> All acknowledgments are required to continue
+                  </p>
+                </div>
                 <div className="space-y-6">
                   <div className="flex items-start space-x-3">
                     <input 
@@ -459,7 +481,7 @@ export default function ApplyPage() {
                     />
                     <label className="text-gray-700">
                       I acknowledge this is a <strong>sale transaction with optional repurchase rights</strong>, not a loan. 
-                      I have no obligation to repurchase my asset.
+                      I have no obligation to repurchase my asset. <span className="text-red-500">*</span>
                     </label>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -472,7 +494,7 @@ export default function ApplyPage() {
                     />
                     <label className="text-gray-700">
                       I understand that <strong>failure to exercise the repurchase option creates no debt or liability</strong> 
-                      and will not affect my credit score.
+                      and will not affect my credit score. <span className="text-red-500">*</span>
                     </label>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -485,7 +507,7 @@ export default function ApplyPage() {
                     />
                     <label className="text-gray-700">
                       I acknowledge that Vaultly will assume <strong>full market risk</strong> for my asset after the 
-                      repurchase deadline expires.
+                      repurchase deadline expires. <span className="text-red-500">*</span>
                     </label>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -498,7 +520,7 @@ export default function ApplyPage() {
                     />
                     <label className="text-gray-700">
                       I consent to <strong>identity verification, OFAC screening</strong>, and reporting to law enforcement 
-                      databases as required by law.
+                      databases as required by law. <span className="text-red-500">*</span>
                     </label>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -511,7 +533,7 @@ export default function ApplyPage() {
                     />
                     <label className="text-gray-700">
                       I have read and agree to the <Link href="/legal/terms" className="text-blue-600 underline">Terms and Conditions</Link> 
-                      and <Link href="/legal/privacy" className="text-blue-600 underline">Privacy Policy</Link>.
+                      and <Link href="/legal/privacy" className="text-blue-600 underline">Privacy Policy</Link>. <span className="text-red-500">*</span>
                     </label>
                   </div>
                 </div>
