@@ -25,8 +25,8 @@ export default function SecurityPage() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="relative h-[450px] rounded-lg overflow-hidden shadow-xl">
             <Image
-              src="/security-page-hero.png"
-              alt="A secure vault with safe deposit boxes"
+              src="/security-vault-image.jpg"
+              alt="Secure vault storage facility with organized shelving and climate-controlled environment"
               layout="fill"
               objectFit="cover"
             />
