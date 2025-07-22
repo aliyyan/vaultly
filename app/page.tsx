@@ -472,9 +472,9 @@ export default function HomePage() {
               asChild
               className="border-2 border-white text-white hover:bg-white hover:text-green-600 rounded-full px-10 py-6 text-lg backdrop-blur-sm"
             >
-              <Link href="tel:555-123-VAULT">
+              <Link href="tel:678-779-7465">
                 <Phone className="w-5 h-5 mr-2" />
-                Call: (555) 123-VAULT
+                Call: 678-779-7465
               </Link>
             </Button>
           </div>

@@ -26,8 +26,8 @@ export default function ContactPage() {
             </CardHeader>
             <CardContent>
               <p>Speak with a member of our team:</p>
-              <a href="tel:1-800-555-8285" className="font-bold text-primary text-lg">
-                1-800-555-VAULT
+              <a href="tel:678-779-7465" className="font-bold text-primary text-lg">
+                678-779-7465
               </a>
               <p className="text-sm text-gray-500 mt-2">Mon-Fri, 9am - 5pm EST</p>
             </CardContent>

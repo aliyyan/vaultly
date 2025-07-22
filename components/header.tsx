@@ -39,9 +39,9 @@ export function Header() {
           ))}
         </nav>
         <div className="hidden lg:flex items-center gap-4">
-          <a href="tel:1-800-555-8285" className="flex items-center gap-2 text-sm font-medium">
+          <a href="tel:678-779-7465" className="flex items-center gap-2 text-sm font-medium">
             <Phone className="h-4 w-4 text-primary" />
-            1-800-555-VAULT
+            678-779-7465
           </a>
           <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6">
             <Link href="/apply">Apply Now</Link>
