@@ -110,6 +110,46 @@ export default function ApplyPage() {
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate required fields
+    const requiredFields = [
+      { field: 'firstName', label: 'First Name' },
+      { field: 'lastName', label: 'Last Name' },
+      { field: 'email', label: 'Email' },
+      { field: 'phone', label: 'Phone' },
+      { field: 'address', label: 'Address' },
+      { field: 'city', label: 'City' },
+      { field: 'state', label: 'State' },
+      { field: 'zipCode', label: 'Zip Code' },
+      { field: 'assetCategory', label: 'Asset Category' },
+      { field: 'assetBrand', label: 'Asset Brand' },
+      { field: 'assetModel', label: 'Asset Model' },
+      { field: 'assetCondition', label: 'Asset Condition' },
+      { field: 'estimatedValue', label: 'Estimated Value' }
+    ]
+    
+    const missingFields = requiredFields.filter(({ field }) => !formData[field as keyof typeof formData])
+    
+    if (missingFields.length > 0) {
+      const fieldNames = missingFields.map(({ label }) => label).join(', ')
+      setSubmitError(`Please fill out all required fields: ${fieldNames}`)
+      return
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setSubmitError("Please enter a valid email address")
+      return
+    }
+    
+    // Validate estimated value is a number
+    if (isNaN(parseFloat(formData.estimatedValue)) || parseFloat(formData.estimatedValue) <= 0) {
+      setSubmitError("Please enter a valid estimated value")
+      return
+    }
+    
+    setSubmitError("") // Clear any previous errors
     setStep(2)
   }
 
