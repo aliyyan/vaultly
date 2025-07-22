@@ -57,7 +57,10 @@ export default function LegalAgreementPage() {
           // You could redirect to a success page here
           // window.location.href = '/apply/agreement-complete'
         } else {
-          alert(`Error: ${result.error}`)
+          const errorMsg = result.details 
+            ? `Error: ${result.error}\nDetails: ${result.details}\nCode: ${result.code || 'N/A'}`
+            : `Error: ${result.error}`
+          alert(errorMsg)
         }
       } catch (error) {
         console.error('Submission error:', error)

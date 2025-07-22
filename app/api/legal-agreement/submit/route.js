@@ -60,7 +60,11 @@ export async function POST(request) {
     if (error) {
       console.error('Database error:', error);
       return NextResponse.json(
-        { error: 'Failed to save agreement' },
+        { 
+          error: 'Failed to save agreement',
+          details: error.message,
+          code: error.code 
+        },
         { status: 500 }
       );
     }
