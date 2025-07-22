@@ -173,8 +173,8 @@ export default function ApplyPage() {
       return
     }
     
-    setSubmitError("") // Clear any previous errors
-    setStep(3) // Go to legal document step
+    // Navigate to the legal agreement page instead of going to step 3
+    window.location.href = '/apply/legal-agreement'
   }
 
   const handleFinalSubmit = async (e: React.FormEvent) => {
@@ -584,9 +584,7 @@ export default function ApplyPage() {
     )
   }
 
-  // Step 3: Legal Document & Signature
-  if (step === 3) {
-    return (
+  // Step 3 removed - now navigates directly to /apply/legal-agreement
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto py-16 max-w-4xl">
           <div className="text-center mb-12">
