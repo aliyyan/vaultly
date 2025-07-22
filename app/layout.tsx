@@ -67,7 +67,10 @@ export const metadata: Metadata = {
     description: "Instant cash advances for luxury assets with white-glove service",
     images: ["/hero-flatlay.png"],
   },
-  generator: 'Vaultly Asset Platform'
+  generator: 'Vaultly Asset Platform',
+  verification: {
+    google: 'f15LTVzlQA1OQYWOYvhUuepURJt87mJZFCw93e-ngOE',
+  }
 }
 
 export default function RootLayout({
