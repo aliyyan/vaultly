@@ -584,7 +584,9 @@ export default function ApplyPage() {
     )
   }
 
-  // Step 3 removed - now navigates directly to /apply/legal-agreement
+  // Step 3: Legal Document & Signature
+  if (step === 3) {
+    return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto py-16 max-w-4xl">
           <div className="text-center mb-12">
