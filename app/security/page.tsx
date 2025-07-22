@@ -23,13 +23,12 @@ export default function SecurityPage() {
 
       <section className="container mx-auto py-20 md:py-28">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="relative h-[450px] rounded-lg overflow-hidden shadow-xl bg-gray-100 flex items-center justify-center">
+          <div className="relative h-[450px] rounded-lg overflow-hidden shadow-xl">
             <Image
-              src="/security-vault-image.jpg"
-              alt="Secure vault storage facility with organized shelving and climate-controlled environment"
-              width={500}
-              height={450}
-              className="rounded-lg object-contain w-full h-full"
+              src="/bank-vault-luxury.png"
+              alt="Luxury bank vault with secure steel doors and modern security systems"
+              fill
+              className="object-cover"
             />
           </div>
           <div>
