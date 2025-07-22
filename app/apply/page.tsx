@@ -10,9 +10,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertTriangle, Shield, FileText, Camera, CreditCard, MapPin, Clock, DollarSign, ArrowRight, CheckCircle2, User, Phone, Mail } from "lucide-react"
 import Link from "next/link"
+import { createAssetApplication } from "@/lib/supabase"
 
 export default function ApplyPage() {
   const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState("")
+  const [applicationId, setApplicationId] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     // Personal Information
     firstName: "",
@@ -109,9 +113,47 @@ export default function ApplyPage() {
     setStep(2)
   }
 
-  const handleFinalSubmit = (e: React.FormEvent) => {
+  const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStep(3)
+    setIsSubmitting(true)
+    setSubmitError("")
+
+    try {
+      // Create the asset application in Supabase
+      const applicationData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip_code: formData.zipCode,
+        asset_type: formData.assetCategory,
+        asset_brand: formData.assetBrand,
+        asset_model: formData.assetModel,
+        asset_description: formData.assetDescription,
+        estimated_value: parseFloat(formData.estimatedValue) || 0,
+        condition: formData.assetCondition,
+        requested_amount: parseFloat(formData.estimatedValue) * 0.6 || 0, // Assuming 60% of estimated value
+        loan_purpose: "Asset-backed loan"
+      }
+
+      const result = await createAssetApplication(applicationData)
+      
+      if (result && result[0]) {
+        setApplicationId(result[0].id)
+        console.log("Application submitted successfully!", result[0])
+        setStep(3) // Move to success step
+      } else {
+        throw new Error("Failed to create application")
+      }
+    } catch (error) {
+      console.error("Error submitting application:", error)
+      setSubmitError("Failed to submit application. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (step === 1) {
@@ -480,11 +522,17 @@ export default function ApplyPage() {
               <Button
                 type="submit"
                 size="lg"
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Application
+                {isSubmitting ? "Submitting..." : "Submit Application"}
                 <CheckCircle2 className="w-6 h-6 ml-3" />
               </Button>
+              {submitError && (
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                  {submitError}
+                </div>
+              )}
               <p className="text-sm text-gray-500">
                 By submitting, you agree to all terms and acknowledge this is a sale transaction
               </p>
@@ -519,7 +567,7 @@ export default function ApplyPage() {
           <div className="grid grid-cols-2 gap-4 mb-8 text-sm">
             <div className="bg-gray-50 p-4 rounded-lg">
               <strong>Application ID:</strong><br/>
-              VLT-{Date.now().toString().slice(-8)}
+              {applicationId ? `APP-${applicationId}` : 'VLT-' + Date.now().toString().slice(-8)}
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <strong>Asset:</strong><br/>
