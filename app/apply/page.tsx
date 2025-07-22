@@ -160,6 +160,7 @@ export default function ApplyPage() {
         legal_agreements_accepted: true
       }
 
+      console.log("Submitting application data:", applicationData)
       const result = await createAssetApplication(applicationData)
       
       if (result && result[0]) {
@@ -167,7 +168,8 @@ export default function ApplyPage() {
         console.log("Application submitted successfully!", result[0])
         setStep(4) // Move to success step (now step 4)
       } else {
-        throw new Error("Failed to create application")
+        console.error("No result returned from createAssetApplication")
+        throw new Error("Failed to create application - no data returned")
       }
     } catch (error) {
       console.error("Error submitting application:", error)

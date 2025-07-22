@@ -91,16 +91,25 @@ export interface AssetApplication {
 }
 
 export async function createAssetApplication(application: Omit<AssetApplication, 'id' | 'created_at' | 'updated_at'>) {
+  console.log('Attempting to create asset application:', application)
+  
   const { data, error } = await supabase
     .from('asset_applications')
     .insert([application])
     .select()
   
   if (error) {
-    console.error('Error creating asset application:', error)
+    console.error('Supabase error creating asset application:', error)
+    console.error('Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    })
     return null
   }
   
+  console.log('Asset application created successfully:', data)
   return data
 }
 
