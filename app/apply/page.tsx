@@ -179,51 +179,9 @@ export default function ApplyPage() {
 
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    setSubmitError("")
-
-    try {
-      // Create the asset application in Supabase with signature data
-      const currentDate = new Date().toISOString()
-      const applicationData = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zip_code: formData.zipCode,
-        asset_type: formData.assetCategory,
-        asset_brand: formData.assetBrand,
-        asset_model: formData.assetModel,
-        asset_description: formData.assetDescription,
-        estimated_value: parseFloat(formData.estimatedValue) || 0,
-        condition: formData.assetCondition,
-        requested_amount: parseFloat(formData.estimatedValue) * 0.6 || 0, // Assuming 60% of estimated value
-        loan_purpose: "Asset-backed loan",
-        signature_date: currentDate,
-        signed_full_name: `${formData.firstName} ${formData.lastName}`,
-        legal_agreements_accepted: true
-      }
-
-      console.log("Submitting application data:", applicationData)
-      const result = await createAssetApplication(applicationData)
-      
-      if (result && result[0]) {
-        setApplicationId(result[0].id)
-        console.log("Application submitted successfully!", result[0])
-        setStep(4) // Move to success step (now step 4)
-      } else {
-        console.error("No result returned from createAssetApplication")
-        throw new Error("Failed to create application - no data returned")
-      }
-    } catch (error) {
-      console.error("Error submitting application:", error)
-      setSubmitError("Failed to submit application. Please try again.")
-    } finally {
-      setIsSubmitting(false)
-    }
+    
+    // Navigate to the legal agreement page instead of submitting to database
+    window.location.href = '/apply/legal-agreement'
   }
 
   if (step === 1) {
