@@ -54,9 +54,8 @@ export default function AssetsWeFundPage() {
                 <Image
                   src={category.img || "/placeholder.svg"}
                   alt={category.name}
-                  layout="fill"
-                  objectFit="cover"
-                  className="group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <CardContent className="p-4">
