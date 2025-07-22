@@ -54,8 +54,8 @@ export default function LegalAgreementPage() {
 
         if (response.ok) {
           alert('Legal agreement signed and saved successfully!')
-          // You could redirect to a success page here
-          // window.location.href = '/apply/agreement-complete'
+          // Redirect to home page after successful submission
+          window.location.href = '/'
         } else {
           const errorMsg = result.details 
             ? `Error: ${result.error}\nDetails: ${result.details}\nCode: ${result.code || 'N/A'}`
