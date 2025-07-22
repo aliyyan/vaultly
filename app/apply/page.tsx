@@ -113,13 +113,19 @@ export default function ApplyPage() {
     setStep(2)
   }
 
+  const handleStep2Submit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setStep(3) // Go to legal document step
+  }
+
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmitError("")
 
     try {
-      // Create the asset application in Supabase
+      // Create the asset application in Supabase with signature data
+      const currentDate = new Date().toISOString()
       const applicationData = {
         first_name: formData.firstName,
         last_name: formData.lastName,
@@ -136,7 +142,10 @@ export default function ApplyPage() {
         estimated_value: parseFloat(formData.estimatedValue) || 0,
         condition: formData.assetCondition,
         requested_amount: parseFloat(formData.estimatedValue) * 0.6 || 0, // Assuming 60% of estimated value
-        loan_purpose: "Asset-backed loan"
+        loan_purpose: "Asset-backed loan",
+        signature_date: currentDate,
+        signed_full_name: `${formData.firstName} ${formData.lastName}`,
+        legal_agreements_accepted: true
       }
 
       const result = await createAssetApplication(applicationData)
@@ -144,7 +153,7 @@ export default function ApplyPage() {
       if (result && result[0]) {
         setApplicationId(result[0].id)
         console.log("Application submitted successfully!", result[0])
-        setStep(3) // Move to success step
+        setStep(4) // Move to success step (now step 4)
       } else {
         throw new Error("Failed to create application")
       }
@@ -415,7 +424,7 @@ export default function ApplyPage() {
             </div>
           </div>
 
-          <form onSubmit={handleFinalSubmit} className="space-y-8">
+          <form onSubmit={handleStep2Submit} className="space-y-8">
             {/* Legal Disclaimer */}
             <div className="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-r-lg">
               <div className="flex items-start">
@@ -519,20 +528,7 @@ export default function ApplyPage() {
               >
                 Back to Edit Information
               </Button>
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isSubmitting}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Submitting..." : "Submit Application"}
-                <CheckCircle2 className="w-6 h-6 ml-3" />
-              </Button>
-              {submitError && (
-                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                  {submitError}
-                </div>
-              )}
+
               <p className="text-sm text-gray-500">
                 By submitting, you agree to all terms and acknowledge this is a sale transaction
               </p>
@@ -543,7 +539,136 @@ export default function ApplyPage() {
     )
   }
 
-  // Step 3: Success Page
+  // Step 3: Legal Document & Signature
+  if (step === 3) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="container mx-auto py-16 max-w-4xl">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">Legal Agreement & Digital Signature</h1>
+            <p className="text-xl text-gray-600">
+              Please review the complete legal agreement and provide your digital signature
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8">
+            <form onSubmit={handleFinalSubmit} className="space-y-8">
+              {/* Legal Document */}
+              <div className="bg-gray-50 border rounded-lg p-6 max-h-96 overflow-y-auto">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                  VAULTLY ASSET PURCHASE AGREEMENT
+                </h3>
+                
+                <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
+                  <p><strong>PARTIES:</strong> This Agreement is between Vaultly, LLC ("Buyer") and {formData.firstName} {formData.lastName} ("Seller").</p>
+                  
+                  <p><strong>ASSET DESCRIPTION:</strong></p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>Type: {formData.assetCategory}</li>
+                    <li>Brand: {formData.assetBrand}</li>
+                    <li>Model: {formData.assetModel}</li>
+                    <li>Condition: {formData.assetCondition}</li>
+                    <li>Description: {formData.assetDescription}</li>
+                  </ul>
+
+                  <p><strong>PURCHASE TERMS:</strong></p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>Estimated Value: ${parseFloat(formData.estimatedValue || '0').toLocaleString()}</li>
+                    <li>Proposed Purchase Amount: ${(parseFloat(formData.estimatedValue || '0') * 0.6).toLocaleString()}</li>
+                    <li>Buyback Period: 90 days from purchase date</li>
+                    <li>Buyback Amount: ${(parseFloat(formData.estimatedValue || '0') * 0.7).toLocaleString()}</li>
+                  </ul>
+
+                  <p><strong>SELLER REPRESENTATIONS & WARRANTIES:</strong></p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>Seller owns the asset free and clear of all liens and encumbrances</li>
+                    <li>Asset description and condition are accurate to the best of Seller's knowledge</li>
+                    <li>Seller has the right to sell the asset</li>
+                    <li>Asset is authentic and not counterfeit</li>
+                  </ul>
+
+                  <p><strong>BUYBACK OPTION:</strong> Seller may repurchase the asset within 90 days by paying the buyback amount plus any applicable fees. If not repurchased, Buyer retains full ownership.</p>
+
+                  <p><strong>INSPECTION & VERIFICATION:</strong> This agreement is subject to Buyer's inspection and authentication of the asset. Final purchase price may be adjusted based on actual condition and market value.</p>
+
+                  <p><strong>PAYMENT:</strong> Payment will be made within 24 hours of asset receipt and verification via ACH transfer to Seller's designated bank account.</p>
+
+                  <p><strong>RISK DISCLOSURE:</strong> Asset values may fluctuate. Seller acknowledges the risk of market value changes during the buyback period.</p>
+
+                  <p><strong>GOVERNING LAW:</strong> This agreement is governed by the laws of the State of Delaware.</p>
+                </div>
+              </div>
+
+              {/* Signature Section */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h4 className="text-xl font-bold text-blue-900 mb-4">Digital Signature</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label className="text-blue-800">Full Legal Name</Label>
+                    <Input
+                      value={`${formData.firstName} ${formData.lastName}`}
+                      readOnly
+                      className="bg-white border-blue-300"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-blue-800">Date</Label>
+                    <Input
+                      value={new Date().toLocaleDateString()}
+                      readOnly
+                      className="bg-white border-blue-300"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 bg-white border-2 border-dashed border-blue-300 rounded-lg text-center">
+                  <p className="text-blue-700 font-medium">
+                    By clicking "Sign & Submit Application" below, I electronically sign this agreement and acknowledge that:
+                  </p>
+                  <ul className="text-sm text-blue-600 mt-2 space-y-1">
+                    <li>• I have read and understand all terms of this agreement</li>
+                    <li>• This constitutes a legally binding digital signature</li>
+                    <li>• I agree to sell my asset under the terms specified above</li>
+                    <li>• All information provided is accurate and complete</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between items-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setStep(2)}
+                  className="px-8 py-4"
+                >
+                  Back to Legal Review
+                </Button>
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={isSubmitting}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Signing & Submitting..." : "Sign & Submit Application"}
+                  <CheckCircle2 className="w-6 h-6 ml-3" />
+                </Button>
+              </div>
+              
+              {submitError && (
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                  {submitError}
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Step 4: Success Page
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
       <div className="container mx-auto py-24 max-w-2xl text-center">

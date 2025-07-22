@@ -34,6 +34,11 @@ CREATE TABLE IF NOT EXISTS asset_applications (
   requested_amount DECIMAL(10,2),
   loan_purpose TEXT,
   
+  -- Legal & Signature
+  signature_date TIMESTAMP WITH TIME ZONE,
+  signed_full_name TEXT,
+  legal_agreements_accepted BOOLEAN DEFAULT FALSE,
+  
   -- Application Status
   status TEXT DEFAULT 'pending',
   

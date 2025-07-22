@@ -82,6 +82,9 @@ export interface AssetApplication {
   condition?: string
   requested_amount?: number
   loan_purpose?: string
+  signature_date?: string
+  signed_full_name?: string
+  legal_agreements_accepted?: boolean
   status?: string
   created_at?: string
   updated_at?: string
