@@ -1,5 +1,5 @@
--- Create Legal_documents table for signed legal agreements
-CREATE TABLE IF NOT EXISTS Legal_documents (
+-- Create legal_documents table for signed legal agreements
+CREATE TABLE IF NOT EXISTS legal_documents (
   id BIGSERIAL PRIMARY KEY,
   -- Personal Information
   seller_name TEXT NOT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS Legal_documents (
 );
 
 -- Enable Row Level Security
-ALTER TABLE Legal_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE legal_documents ENABLE ROW LEVEL SECURITY;
 
 -- Create policy to allow all operations (you can make this more restrictive later)
-DROP POLICY IF EXISTS "Allow all operations on Legal_documents" ON Legal_documents;
-CREATE POLICY "Allow all operations on Legal_documents" ON Legal_documents
+DROP POLICY IF EXISTS "Allow all operations on legal_documents" ON legal_documents;
+CREATE POLICY "Allow all operations on legal_documents" ON legal_documents
 FOR ALL USING (true) WITH CHECK (true); 
