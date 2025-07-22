@@ -407,11 +407,11 @@ export default function ApplyPage() {
                 size="lg"
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
               >
-                Continue to Legal Review
+                Continue to Asset Details
                 <ArrowRight className="w-6 h-6 ml-3" />
               </Button>
               <p className="text-sm text-gray-500 mt-4">
-                Next: Review legal terms and complete application
+                Next: Asset details and legal review
               </p>
             </div>
           </form>
@@ -540,21 +540,37 @@ export default function ApplyPage() {
               </CardContent>
             </Card>
 
-            {/* Submit Button */}
-            <div className="text-center space-y-4">
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center">
               <Button
                 type="button"
                 variant="outline"
+                size="lg"
                 onClick={() => setStep(1)}
-                className="mr-4"
+                className="px-8 py-4"
               >
                 Back to Edit Information
               </Button>
-
-              <p className="text-sm text-gray-500">
-                By submitting, you agree to all terms and acknowledge this is a sale transaction
-              </p>
+              
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
+              >
+                Continue to Legal Review
+                <ArrowRight className="w-6 h-6 ml-3" />
+              </Button>
             </div>
+            
+            {submitError && (
+              <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200 mt-4">
+                {submitError}
+              </div>
+            )}
+            
+            <p className="text-sm text-gray-500 text-center mt-4">
+              By continuing, you agree to all terms and acknowledge this is a sale transaction
+            </p>
           </form>
         </div>
       </div>
