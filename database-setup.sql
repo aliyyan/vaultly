@@ -88,8 +88,8 @@ INSERT INTO asset_categories (name, max_funding_amount, description) VALUES
 ('Other', 10000.00, 'Art, collectibles, antiques, sports memorabilia')
 ON CONFLICT (name) DO NOTHING;
 
--- 7. Create legal_agreements table (for signed agreements)
-CREATE TABLE IF NOT EXISTS legal_agreements (
+-- 7. Create Legal_documents table (for signed agreements)
+CREATE TABLE IF NOT EXISTS Legal_documents (
   id BIGSERIAL PRIMARY KEY,
   -- Personal Information
   seller_name TEXT NOT NULL,
@@ -123,7 +123,7 @@ ALTER TABLE asset_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE asset_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE asset_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE legal_agreements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE Legal_documents ENABLE ROW LEVEL SECURITY;
 
 -- 8. Create policies (allowing all operations for development)
 -- Note: In production, you should create more restrictive policies
@@ -158,8 +158,8 @@ CREATE POLICY "Allow all operations on asset_categories" ON asset_categories
 FOR ALL USING (true) WITH CHECK (true);
 
 -- Legal agreements policies
-DROP POLICY IF EXISTS "Allow all operations on legal_agreements" ON legal_agreements;
-CREATE POLICY "Allow all operations on legal_agreements" ON legal_agreements
+DROP POLICY IF EXISTS "Allow all operations on Legal_documents" ON Legal_documents;
+CREATE POLICY "Allow all operations on Legal_documents" ON Legal_documents
 FOR ALL USING (true) WITH CHECK (true);
 
 -- 9. Create storage bucket for asset images

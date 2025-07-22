@@ -37,7 +37,7 @@ export async function POST(request) {
 
     // Save to database
     const { data, error } = await supabase
-      .from('legal_agreements')
+      .from('Legal_documents')
       .insert([
         {
           seller_name: sellerName,
