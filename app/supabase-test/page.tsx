@@ -1,3 +1,4 @@
+import DatabaseTest from '@/components/database-test'
 import SupabaseExample from '@/components/supabase-example'
 
 export default function SupabaseTestPage() {
@@ -6,14 +7,19 @@ export default function SupabaseTestPage() {
       <div className="container mx-auto py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Supabase Integration Test
+            Database Connection & Testing
           </h1>
           <p className="text-lg text-gray-600">
-            Test your Supabase connection and database operations
+            Comprehensive test of your Supabase database setup
           </p>
         </div>
         
-        <SupabaseExample />
+        <DatabaseTest />
+        
+        <div className="mt-12 border-t pt-8">
+          <h2 className="text-2xl font-bold text-center mb-6">Simple Todo Example</h2>
+          <SupabaseExample />
+        </div>
         
         <div className="mt-8 text-center">
           <a
