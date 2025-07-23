@@ -78,8 +78,14 @@ class AssetValuationService {
       return { isValid: false, reason: 'Brand name too short or invalid' }
     }
     
+    // For consumer goods, be more flexible about model field (could be description)
     if (!assetModel || assetModel.length < 2) {
-      return { isValid: false, reason: 'Model name too short or invalid' }
+      // If it's a simple consumer good, check if description can fill in
+      if (this.isSimpleConsumerGood(assetData) && assetData.assetDescription && assetData.assetDescription.length > 5) {
+        // Allow it - the description provides the needed details
+      } else {
+        return { isValid: false, reason: 'Product model/description too short or invalid' }
+      }
     }
 
     // Step 2: Check for obvious gibberish (random characters)
@@ -160,70 +166,18 @@ class AssetValuationService {
       ]
     }
 
+    // Optional: Check if brand is recognized (for better pricing), but don't reject unknown brands
     const categoryBrands = knownBrands[assetCategory] || []
-    if (categoryBrands.length > 0) {
-      const brandFound = categoryBrands.some(brand => 
-        assetBrand.toLowerCase().includes(brand) || brand.includes(assetBrand.toLowerCase())
-      )
-      
-      if (!brandFound) {
-        return { 
-          isValid: false, 
-          reason: `Brand "${assetBrand}" not recognized in ${assetCategory} category` 
-        }
-      }
-    }
+    const isRecognizedLuxuryBrand = categoryBrands.length > 0 && categoryBrands.some(brand => 
+      assetBrand.toLowerCase().includes(brand) || brand.includes(assetBrand.toLowerCase())
+    )
 
-    // Check for consumer goods that shouldn't be quoted
-    const consumerGoodsCheck = this.validateConsumerGoods(assetData)
-    if (!consumerGoodsCheck.isValid) {
-      return consumerGoodsCheck
-    }
+    // Note: We provide quotes for all valid items, including consumer goods
 
     return { isValid: true }
   }
 
-  private validateConsumerGoods(assetData: any) {
-    const { assetBrand, assetModel } = assetData
-    const brandLower = assetBrand.toLowerCase()
-    const modelLower = assetModel.toLowerCase()
 
-    // Mass-market brands we don't quote on
-    const consumerBrands = [
-      'nike', 'adidas', 'puma', 'under armour', 'reebok', 'new balance',
-      'champion', 'fila', 'vans', 'converse', 'jordan', 'polo ralph lauren',
-      'tommy hilfiger', 'calvin klein', 'gap', 'old navy', 'target', 
-      'walmart', 'h&m', 'zara', 'uniqlo', 'forever 21', 'shein',
-      'american eagle', 'hollister', 'abercrombie', 'urban outfitters'
-    ]
-
-    // Sports/apparel terms that indicate mass-market items
-    const consumerTerms = [
-      'jersey', 't-shirt', 'tshirt', 'hoodie', 'sweatshirt', 'jeans',
-      'sneakers', 'running shoes', 'basketball shoes', 'cleats',
-      'cap', 'hat', 'beanie', 'socks', 'underwear', 'shorts',
-      'tracksuit', 'joggers', 'leggings', 'sports bra'
-    ]
-
-    // Check if it's a consumer brand
-    const isConsumerBrand = consumerBrands.some(brand => 
-      brandLower.includes(brand) || brand.includes(brandLower)
-    )
-
-    // Check if it's consumer apparel/footwear
-    const isConsumerItem = consumerTerms.some(term => 
-      modelLower.includes(term) || brandLower.includes(term)
-    )
-
-    if (isConsumerBrand || isConsumerItem) {
-      return {
-        isValid: false,
-        reason: `We don't provide quotes for mass-market consumer goods like ${assetBrand} ${assetModel}. We specialize in luxury items, collectibles, and high-value assets.`
-      }
-    }
-
-    return { isValid: true }
-  }
 
   private async checkProductExists(assetData: any) {
     try {
@@ -270,9 +224,21 @@ class AssetValuationService {
   private async checkRequiredInformation(assetData: any): Promise<{sufficient: boolean, message?: string}> {
     const { assetCategory, assetBrand, assetModel, assetDescription = '' } = assetData
     
-    const missingInfo: string[] = []
-    const suggestions: string[] = []
+    // First, check if this is a consumer good that doesn't need detailed specs
+    if (this.isSimpleConsumerGood(assetData)) {
+      // For simple consumer goods, just need brand + model/description to be reasonably complete
+      const fullDescription = `${assetBrand} ${assetModel} ${assetDescription}`.trim()
+      if (fullDescription.length >= 10) {
+        return { sufficient: true }
+      } else {
+        return { 
+          sufficient: false, 
+          message: "Please provide more details about the item in the description field" 
+        }
+      }
+    }
 
+    // For high-value items, require detailed specifications
     if (assetCategory === "Luxury Watches") {
       const watchInfo = this.analyzeWatchInformation(assetBrand, assetModel, assetDescription)
       if (!watchInfo.sufficient) {
@@ -306,6 +272,45 @@ class AssetValuationService {
     }
 
     return { sufficient: true }
+  }
+
+  private isSimpleConsumerGood(assetData: any): boolean {
+    const { assetCategory, assetBrand, assetModel } = assetData
+    const brandLower = assetBrand.toLowerCase()
+    const modelLower = assetModel.toLowerCase()
+
+    // Mass market clothing/apparel brands
+    const consumerBrands = [
+      'nike', 'adidas', 'puma', 'under armour', 'reebok', 'new balance',
+      'champion', 'fila', 'vans', 'converse', 'jordan', 'polo ralph lauren',
+      'tommy hilfiger', 'calvin klein', 'gap', 'old navy', 'h&m', 'zara',
+      'uniqlo', 'forever 21', 'american eagle', 'hollister', 'abercrombie',
+      'urban outfitters', 'levi', 'levis'
+    ]
+
+    // Consumer item types that don't need detailed specs
+    const consumerItemTypes = [
+      'jersey', 't-shirt', 'tshirt', 'hoodie', 'sweatshirt', 'jeans',
+      'sneakers', 'shoes', 'cap', 'hat', 'shorts', 'tracksuit', 'joggers',
+      'jacket', 'polo', 'shirt', 'pants', 'dress', 'skirt', 'sweater'
+    ]
+
+    // Check if it's a consumer brand
+    const isConsumerBrand = consumerBrands.some(brand => 
+      brandLower.includes(brand) || brand.includes(brandLower)
+    )
+
+    // Check if it's a consumer item type
+    const isConsumerItemType = consumerItemTypes.some(itemType => 
+      modelLower.includes(itemType) || brandLower.includes(itemType)
+    )
+
+    // Also consider "Other" category items under $500 estimated value as simple
+    const isLowValueOther = assetCategory === "Other" && 
+      assetData.estimatedValue && 
+      parseFloat(assetData.estimatedValue) < 500
+
+    return isConsumerBrand || isConsumerItemType || isLowValueOther
   }
 
   private analyzeWatchInformation(brand: string, model: string, description: string) {
@@ -753,10 +758,13 @@ class AssetValuationService {
         return await this.searchWatchAPI(assetBrand, assetModel)
       } else if (assetCategory === "Fine Jewelry") {
         return await this.searchJewelryAPI(assetBrand, assetModel)
-      } else if (assetCategory === "Premium Electronics") {
+      } else if (assetCategory === "Premium Electronics" || assetCategory === "Electronics") {
         return await this.searchElectronicsAPI(assetBrand, assetModel)
       } else if (assetCategory === "Designer Handbags") {
         return await this.searchLuxuryAPI(assetBrand, assetModel)
+      } else {
+        // For all other categories including consumer goods
+        return await this.searchConsumerGoodsAPI(assetBrand, assetModel)
       }
     } catch (error) {
       console.error('Specialized API error:', error)
@@ -827,24 +835,57 @@ class AssetValuationService {
   }
 
   private async searchElectronicsAPI(brand: string, model: string) {
-    // Electronics depreciate quickly, conservative estimates
+    // Electronics depreciate quickly, but include both premium and consumer brands
     const electronicsValues: { [key: string]: number } = {
       'apple iphone': 800,
       'apple macbook': 1200,
       'apple ipad': 500,
+      'samsung galaxy': 600,
+      'samsung note': 700,
       'canon': 1500,
       'nikon': 1200,
       'sony': 1000,
-      'samsung': 600
+      'microsoft surface': 800,
+      'dell xps': 900,
+      'hp spectre': 700,
+      'lenovo thinkpad': 650,
+      'asus rog': 1100,
+      'bose': 300,
+      'beats': 150,
+      'airpods': 180
     }
 
     const key = `${brand} ${model}`.toLowerCase()
-    let basePrice = 500
+    let basePrice = 300 // Lower default for consumer electronics
 
     for (const [device, price] of Object.entries(electronicsValues)) {
-      if (key.includes(device.split(' ')[0])) {
+      const deviceParts = device.split(' ')
+      if (deviceParts.every(part => key.includes(part))) {
         basePrice = price
         break
+      }
+    }
+
+    // If no specific match found, try brand-only matching with lower values
+    if (basePrice === 300) {
+      const brandValues: { [key: string]: number } = {
+        'apple': 600,
+        'samsung': 400,
+        'sony': 350,
+        'microsoft': 450,
+        'dell': 400,
+        'hp': 350,
+        'lenovo': 300,
+        'asus': 400,
+        'bose': 200,
+        'beats': 120
+      }
+      
+      for (const [brandName, price] of Object.entries(brandValues)) {
+        if (key.includes(brandName)) {
+          basePrice = price
+          break
+        }
       }
     }
 
@@ -885,6 +926,78 @@ class AssetValuationService {
     }
   }
 
+  private async searchConsumerGoodsAPI(brand: string, model: string) {
+    const brandLower = brand.toLowerCase()
+    const modelLower = model.toLowerCase()
+
+    // Consumer goods pricing based on brand recognition and item type
+    const consumerBrandValues: { [key: string]: number } = {
+      'nike': 150,
+      'adidas': 140,
+      'puma': 120,
+      'under armour': 100,
+      'reebok': 90,
+      'new balance': 130,
+      'champion': 80,
+      'fila': 90,
+      'vans': 80,
+      'converse': 70,
+      'jordan': 200,
+      'polo ralph lauren': 120,
+      'tommy hilfiger': 100,
+      'calvin klein': 90,
+      'gap': 60,
+      'h&m': 30,
+      'zara': 40,
+      'uniqlo': 35,
+      'forever 21': 25,
+      'american eagle': 60,
+      'hollister': 65,
+      'abercrombie': 80,
+      'urban outfitters': 70
+    }
+
+    let basePrice = 50 // Default for unknown consumer brands
+
+    // Find matching brand
+    for (const [brandName, price] of Object.entries(consumerBrandValues)) {
+      if (brandLower.includes(brandName) || brandName.includes(brandLower)) {
+        basePrice = price
+        break
+      }
+    }
+
+    // Adjust based on item type and special characteristics
+    let multiplier = 1.0
+    
+    if (modelLower.includes('limited edition') || modelLower.includes('limited')) {
+      multiplier = 2.5
+    } else if (modelLower.includes('special edition') || modelLower.includes('collaboration')) {
+      multiplier = 2.0
+    } else if (modelLower.includes('vintage') || modelLower.includes('retro')) {
+      multiplier = 1.8
+    } else if (modelLower.includes('rare') || modelLower.includes('exclusive')) {
+      multiplier = 2.2
+    } else if (modelLower.includes('jersey') && (brandLower.includes('nike') || brandLower.includes('adidas'))) {
+      multiplier = 0.7 // Regular sports jerseys are lower value
+    } else if (modelLower.includes('sneakers') || modelLower.includes('shoes')) {
+      multiplier = 1.2 // Sneakers typically retain more value
+    } else if (modelLower.includes('hoodie') || modelLower.includes('sweatshirt')) {
+      multiplier = 0.8
+    } else if (modelLower.includes('t-shirt') || modelLower.includes('tshirt')) {
+      multiplier = 0.6
+    }
+
+    const finalPrice = Math.round(basePrice * multiplier)
+
+    return {
+      price: Math.max(20, finalPrice), // Minimum $20 for any item
+      sources: ['Consumer Goods Market Data'],
+      count: 1,
+      reliability: 0.65
+    }
+  }
+
   private calculateWeightedAverage(results: any[]) {
     let totalWeightedPrice = 0
     let totalWeight = 0
@@ -899,7 +1012,55 @@ class AssetValuationService {
   }
 
   private getFallbackEstimate(assetData: any) {
-    // Conservative fallback estimates by category - these should only be reached for validated luxury items
+    const { assetCategory, assetBrand, assetModel } = assetData
+    const brandLower = assetBrand.toLowerCase()
+    const modelLower = assetModel.toLowerCase()
+
+    // Check if it's a mass market brand and provide appropriate pricing
+    const massMarketBrands: { [key: string]: number } = {
+      'nike': 150,
+      'adidas': 140,
+      'puma': 120,
+      'under armour': 100,
+      'reebok': 90,
+      'new balance': 130,
+      'champion': 80,
+      'fila': 90,
+      'vans': 80,
+      'converse': 70,
+      'jordan': 200,
+      'polo ralph lauren': 120,
+      'tommy hilfiger': 100,
+      'calvin klein': 90,
+      'gap': 60,
+      'h&m': 30,
+      'zara': 40,
+      'uniqlo': 35,
+      'forever 21': 25,
+      'american eagle': 60,
+      'hollister': 65,
+      'abercrombie': 80,
+      'urban outfitters': 70
+    }
+
+    // Check for mass market brand match
+    for (const [brand, basePrice] of Object.entries(massMarketBrands)) {
+      if (brandLower.includes(brand) || brand.includes(brandLower)) {
+        // Adjust based on item type
+        let multiplier = 1.0
+        if (modelLower.includes('limited') || modelLower.includes('special edition')) {
+          multiplier = 2.0
+        } else if (modelLower.includes('vintage') || modelLower.includes('retro')) {
+          multiplier = 1.5
+        } else if (modelLower.includes('jersey') && brandLower === 'nike') {
+          multiplier = 0.8 // Regular jerseys are lower value
+        }
+        
+        return Math.round(basePrice * multiplier)
+      }
+    }
+
+    // Fallback estimates by category for non-mass-market items
     const fallbackValues: { [key: string]: number } = {
       "Luxury Watches": 5000,
       "Fine Jewelry": 2500,
@@ -907,10 +1068,10 @@ class AssetValuationService {
       "Premium Electronics": 800,
       "Musical Instruments": 1500,
       "Photography Equipment": 1200,
-      "Other": 3000 // Higher since this should only be reached for verified luxury collectibles
+      "Other": 1000
     }
 
-    return fallbackValues[assetData.assetCategory] || 1000
+    return fallbackValues[assetCategory] || 500
   }
 
   private generateMarketNotes(results: any[], assetData: any) {
