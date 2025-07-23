@@ -178,17 +178,24 @@ function QuoteContent() {
                             error.includes('not found') ||
                             error.includes('Invalid product') ||
                             error.includes('Product validation failed')
+    
+    const isInsufficientInfo = error.includes('INSUFFICIENT_INFO:')
+    const infoMessage = isInsufficientInfo ? error.replace('INSUFFICIENT_INFO: ', '') : ''
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
         <div className="container mx-auto py-16 max-w-4xl">
           <div className="text-center mb-12">
             <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              {isValidationError ? 'Product Not Found' : 'Quote Generation Error'}
+              {isValidationError ? 'Product Not Found' : 
+               isInsufficientInfo ? 'More Information Needed' : 
+               'Quote Generation Error'}
             </h1>
             <p className="text-xl text-gray-600">
               {isValidationError 
                 ? "We couldn't find this product in our database" 
+                : isInsufficientInfo
+                ? "We need more details to provide an accurate quote"
                 : "We encountered an issue generating your quote"
               }
             </p>
@@ -203,10 +210,30 @@ function QuoteContent() {
                 
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold text-red-900">
-                    {isValidationError ? 'Invalid Product Information' : 'Unable to Generate Quote'}
+                    {isValidationError ? 'Invalid Product Information' : 
+                     isInsufficientInfo ? 'Additional Details Required' :
+                     'Unable to Generate Quote'}
                   </h3>
                   
-                  {isValidationError ? (
+                  {isInsufficientInfo ? (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-left">
+                      <h4 className="font-bold text-blue-800 mb-3">For the most accurate quote:</h4>
+                      <div className="bg-white border border-blue-300 rounded-lg p-4 mb-4">
+                        <p className="text-blue-700 font-medium">{infoMessage}</p>
+                      </div>
+                      <div className="space-y-2 text-blue-700 text-sm">
+                        <p><strong>💡 How to add this information:</strong></p>
+                        <p>1. Click "Fix Product Information" below</p>
+                        <p>2. Add the requested details to your <strong>Description</strong> field</p>
+                        <p>3. Click "Get Instant Quote" again</p>
+                      </div>
+                      <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-lg">
+                        <p className="text-blue-800 text-sm font-medium">
+                          📊 More details = More accurate pricing
+                        </p>
+                      </div>
+                    </div>
+                  ) : isValidationError ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-left">
                       <h4 className="font-bold text-amber-800 mb-3">Please check your product details:</h4>
                       <ul className="text-amber-700 space-y-2 list-disc list-inside text-sm">
@@ -232,9 +259,9 @@ function QuoteContent() {
                     onClick={() => router.push('/apply')}
                     className="px-8 py-3"
                   >
-                    {isValidationError ? 'Fix Product Information' : 'Back to Application'}
+                    {(isValidationError || isInsufficientInfo) ? 'Fix Product Information' : 'Back to Application'}
                   </Button>
-                  {!isValidationError && (
+                  {!isValidationError && !isInsufficientInfo && (
                     <Button 
                       onClick={generateQuote}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
