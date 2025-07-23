@@ -259,23 +259,14 @@ function QuoteContent() {
             </div>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                <h4 className="font-bold text-blue-900 mb-2">Market Value</h4>
-                <p className="text-2xl font-bold text-blue-700">
-                  ${quoteData.finalMarketValue.toLocaleString()}
-                </p>
-                <p className="text-sm text-blue-600 mt-1">
-                  {quoteData.confidenceScore}% confidence
-                </p>
-              </div>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h4 className="font-bold text-green-900 mb-2">Your Cash Offer</h4>
                 <p className="text-2xl font-bold text-green-700">
                   ${quoteData.quoteAmount.toLocaleString()}
                 </p>
                 <p className="text-sm text-green-600 mt-1">
-                  40% of market value
+                  Based on current market analysis
                 </p>
               </div>
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">
@@ -284,7 +275,7 @@ function QuoteContent() {
                   ${quoteData.buybackAmount.toLocaleString()}
                 </p>
                 <p className="text-sm text-purple-600 mt-1">
-                  90-day option
+                  90-day repurchase option
                 </p>
               </div>
             </div>
@@ -316,21 +307,21 @@ function QuoteContent() {
               </div>
             </div>
 
-            {/* Research Confidence */}
+            {/* Market Analysis */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="font-bold text-blue-900">Research Confidence</h4>
+                <h4 className="font-bold text-blue-900">Market Analysis</h4>
                 <Badge className={`${getConfidenceColor(quoteData.confidenceScore)} bg-white border`}>
                   {quoteData.confidenceScore}% Confidence
                 </Badge>
               </div>
               <div className="space-y-3">
                 <div>
-                  <span className="text-blue-700 font-medium">Data Sources:</span>
+                  <span className="text-blue-700 font-medium">Research Sources:</span>
                   <span className="text-blue-600 ml-2">{quoteData.valuationSources.join(', ')}</span>
                 </div>
                 <div>
-                  <span className="text-blue-700 font-medium">Analysis:</span>
+                  <span className="text-blue-700 font-medium">Market Notes:</span>
                   <p className="text-blue-600 mt-1">{quoteData.researchNotes}</p>
                 </div>
               </div>
