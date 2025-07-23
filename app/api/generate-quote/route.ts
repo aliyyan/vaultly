@@ -251,32 +251,68 @@ class AssetValuationService {
   }
 
   private needsSpecificDetails(assetData: any): boolean {
-    const { assetCategory, assetBrand, assetModel, estimatedValue } = assetData
+    const { assetCategory, assetBrand, assetModel, estimatedValue, assetDescription = '' } = assetData
     const brandLower = assetBrand.toLowerCase()
     const modelLower = assetModel.toLowerCase()
+    const descLower = assetDescription.toLowerCase()
     const estimatedVal = parseFloat(estimatedValue) || 0
 
-    // High-value luxury items that need specific details for accurate pricing
-    const highValueBrands = [
-      'rolex', 'patek philippe', 'audemars piguet', 'omega', 'cartier',
-      'hermes', 'chanel', 'louis vuitton', 'tiffany', 'bulgari',
-      'van cleef', 'harry winston', 'apple', 'canon', 'nikon',
-      'gibson', 'fender', 'steinway'
+    // EVERY item over $500 needs specific details for accurate pricing
+    if (estimatedVal > 500) return true
+
+    // Category-specific requirements - ALL categories need details for accuracy
+    const categoryRequirements = {
+      'Luxury Watches': true,
+      'Fine Jewelry': true,
+      'Designer Handbags': true,
+      'Premium Electronics': true,
+      'Electronics': true,
+      'Musical Instruments': true,
+      'Photography Equipment': true,
+      'Vehicles': true,
+      'Motorcycles': true,
+      'Sports Equipment': true,
+      'Collectibles': true,
+      'Art': true,
+      'Antiques': true,
+      'Tools': true,
+      'Furniture': true,
+      'Home Appliances': true,
+      'Gaming Equipment': true,
+      'Computers': true,
+      'Other': estimatedVal > 200 // Other category needs details if over $200
+    }
+
+    if (categoryRequirements[assetCategory as keyof typeof categoryRequirements]) return true
+
+    // Brand recognition for items that vary widely in value
+    const variableBrands = [
+      // Luxury brands
+      'rolex', 'patek philippe', 'audemars piguet', 'omega', 'cartier', 'breitling',
+      'hermes', 'chanel', 'louis vuitton', 'gucci', 'prada', 'dior', 'tiffany', 'bulgari',
+      // Electronics
+      'apple', 'samsung', 'sony', 'canon', 'nikon', 'bose', 'microsoft', 'dell', 'hp',
+      // Vehicles
+      'ferrari', 'lamborghini', 'porsche', 'bmw', 'mercedes', 'audi', 'tesla', 'ford', 'chevrolet',
+      // Musical instruments
+      'gibson', 'fender', 'martin', 'taylor', 'steinway', 'yamaha',
+      // Art/Collectibles
+      'banksy', 'picasso', 'warhol', 'pokemon', 'magic', 'topps', 'panini',
+      // Tools
+      'snap-on', 'mac tools', 'festool', 'milwaukee', 'dewalt',
+      // Vintage items
+      'vintage', 'antique', 'rare', 'limited edition', 'first edition'
     ]
 
-    // Items over $2000 estimated value need details
-    if (estimatedVal > 2000) return true
-
-    // Specific luxury brands always need details
-    const needsDetails = highValueBrands.some(brand => 
-      brandLower.includes(brand) || brand.includes(brandLower)
+    const needsDetails = variableBrands.some(brand => 
+      brandLower.includes(brand) || modelLower.includes(brand) || descLower.includes(brand)
     )
 
-    // Luxury categories always need details
-    const luxuryCategories = ['Luxury Watches', 'Fine Jewelry', 'Designer Handbags']
-    if (luxuryCategories.includes(assetCategory)) return true
+    // Simple consumer items under $200 with common brands can get instant quotes
+    const simpleConsumerBrands = ['nike', 'adidas', 'h&m', 'zara', 'gap', 'old navy']
+    const isSimpleConsumer = simpleConsumerBrands.some(brand => brandLower.includes(brand)) && estimatedVal < 200
 
-    return needsDetails
+    return needsDetails && !isSimpleConsumer
   }
 
   private async checkRequiredDetails(assetData: any): Promise<{sufficient: boolean, message?: string}> {
@@ -287,64 +323,156 @@ class AssetValuationService {
     
     const missing: string[] = []
 
-    // Luxury Watches - need specific details for accurate pricing
-    if (assetCategory === "Luxury Watches" || this.isLuxuryWatch(assetBrand)) {
+    // VEHICLES - Critical details for accurate pricing
+    if (assetCategory === "Vehicles" || this.isVehicle(assetBrand, assetModel)) {
+      if (!this.hasYearInfo(descLower)) missing.push('Year (e.g., "2018", "2021")')
+      if (!this.hasMileage(descLower)) missing.push('Mileage (e.g., "45,000 miles", "low mileage")')
+      if (!this.hasEngineInfo(descLower)) missing.push('Engine details (e.g., "V6", "4-cylinder", "electric")')
+      if (!this.hasTransmission(descLower)) missing.push('Transmission (e.g., "manual", "automatic")')
+      if (!this.hasVehicleCondition(descLower)) missing.push('Specific condition (e.g., "clean title", "accident history", "maintenance records")')
+    }
+
+    // MOTORCYCLES - Similar to vehicles but specific details
+    else if (assetCategory === "Motorcycles" || this.isMotorcycle(assetBrand, assetModel)) {
+      if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture')
+      if (!this.hasMileage(descLower)) missing.push('Mileage or usage hours')
+      if (!this.hasEngineSize(descLower)) missing.push('Engine size (e.g., "600cc", "1200cc")')
+      if (!this.hasModifications(descLower)) missing.push('Modifications status (e.g., "stock", "aftermarket exhaust")')
+    }
+
+    // LUXURY WATCHES - Detailed requirements for accurate pricing
+    else if (assetCategory === "Luxury Watches" || this.isLuxuryWatch(assetBrand)) {
       if (brandLower.includes('rolex')) {
-        if (!this.hasYearInfo(descLower)) {
-          missing.push('Year of manufacture (e.g., "2021", "1990s")')
-        }
+        if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture (e.g., "2021", "1990s")')
         if (modelLower.includes('submariner') || modelLower.includes('datejust') || modelLower.includes('daytona')) {
-          if (!this.hasReferenceNumber(descLower)) {
-            missing.push('Reference number (e.g., "116610LN", "126610LV")')
-          }
+          if (!this.hasReferenceNumber(descLower)) missing.push('Reference number (e.g., "116610LN", "126610LV")')
         }
-        if (!this.hasBoxPapers(descLower)) {
-          missing.push('Box and papers status (e.g., "with box and papers", "watch only")')
-        }
+        if (!this.hasBoxPapers(descLower)) missing.push('Box and papers status (e.g., "with box and papers", "watch only")')
       } else if (brandLower.includes('patek')) {
         if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture')
         if (!this.hasReferenceNumber(descLower)) missing.push('Reference number (e.g., "5711/1A")')
         if (!this.hasBoxPapers(descLower)) missing.push('Documentation status')
       } else {
-        if (!this.hasBasicWatchDetails(descLower)) {
-          missing.push('More details (year, size, material, condition specifics)')
+        if (!this.hasBasicWatchDetails(descLower)) missing.push('More details (year, size, material, condition specifics)')
+      }
+    }
+
+    // COLLECTIBLES - Cards, Comics, Memorabilia
+    else if (assetCategory === "Collectibles" || this.isCollectible(assetBrand, assetModel)) {
+      if (this.isPokemonCard(assetBrand, assetModel) || this.isTradingCard(assetBrand, assetModel)) {
+        if (!this.hasCardGrade(descLower)) missing.push('Card grade (e.g., "PSA 10", "BGS 9.5", "ungraded")')
+        if (!this.hasCardSet(descLower)) missing.push('Set name (e.g., "Base Set", "1st Edition")')
+        if (!this.hasCardNumber(descLower)) missing.push('Card number (e.g., "#25/102")')
+      } else if (this.isComic(assetBrand, assetModel)) {
+        if (!this.hasComicGrade(descLower)) missing.push('Comic grade (e.g., "CGC 9.8", "raw/ungraded")')
+        if (!this.hasIssueNumber(descLower)) missing.push('Issue number (e.g., "#1", "Vol 1 #25")')
+        if (!this.hasYearInfo(descLower)) missing.push('Publication year')
+      } else {
+        if (!this.hasCollectibleCondition(descLower)) missing.push('Detailed condition (e.g., "mint condition", "box damage", "missing pieces")')
+        if (!this.hasAuthenticity(descLower)) missing.push('Authenticity (e.g., "authenticated", "certificate of authenticity")')
+      }
+    }
+
+    // SPORTS EQUIPMENT - Varies widely based on type
+    else if (assetCategory === "Sports Equipment" || this.isSportsEquipment(assetBrand, assetModel)) {
+      if (this.isGolfEquipment(assetBrand, assetModel)) {
+        if (!this.hasGolfSpecs(descLower)) missing.push('Specifications (e.g., "loft", "shaft type", "set composition")')
+        if (!this.hasUsageLevel(descLower)) missing.push('Usage level (e.g., "barely used", "well-maintained")')
+      } else if (this.isFitnessEquipment(assetBrand, assetModel)) {
+        if (!this.hasWeight(descLower)) missing.push('Weight/size specifications')
+        if (!this.hasUsageLevel(descLower)) missing.push('Usage condition')
+      }
+    }
+
+    // ELECTRONICS & COMPUTERS - Comprehensive specs needed
+    else if (assetCategory === "Electronics" || assetCategory === "Premium Electronics" || assetCategory === "Computers" || assetCategory === "Gaming Equipment") {
+      if (brandLower.includes('apple')) {
+        if (modelLower.includes('iphone')) {
+          if (!this.hasStorageCapacity(descLower)) missing.push('Storage capacity (e.g., "128GB", "256GB", "512GB")')
+          if (!this.hasCarrierInfo(descLower)) missing.push('Carrier status (e.g., "unlocked", "Verizon", "AT&T")')
+          if (!this.hasYearInfo(descLower)) missing.push('Year or generation (e.g., "iPhone 15", "2023")')
+        } else if (modelLower.includes('macbook') || modelLower.includes('imac')) {
+          if (!this.hasProcessorInfo(descLower)) missing.push('Processor (e.g., "M2 chip", "Intel i7")')
+          if (!this.hasRAM(descLower)) missing.push('RAM (e.g., "16GB", "32GB")')
+          if (!this.hasStorageCapacity(descLower)) missing.push('Storage (e.g., "512GB SSD", "1TB")')
+          if (!this.hasScreenSize(descLower)) missing.push('Screen size (e.g., "13-inch", "16-inch")')
+          if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture')
         }
+      } else if (this.isGamingConsole(assetBrand, assetModel)) {
+        if (!this.hasStorageCapacity(descLower)) missing.push('Storage capacity')
+        if (!this.hasControllerInfo(descLower)) missing.push('Included controllers and accessories')
+        if (!this.hasYearInfo(descLower)) missing.push('Model year or generation')
+      } else if (this.isCamera(assetBrand, assetModel)) {
+        if (!this.hasShutterCount(descLower)) missing.push('Shutter count (e.g., "5,000 shots", "low usage")')
+        if (!this.hasLensInfo(descLower)) missing.push('Lens information (e.g., "body only", "with 24-70mm lens")')
+        if (!this.hasAccessories(descLower)) missing.push('Included accessories')
+      } else {
+        if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture')
+        if (!this.hasSpecifications(descLower)) missing.push('Key specifications')
       }
     }
 
-    // Fine Jewelry - need specs for accurate pricing
+    // MUSICAL INSTRUMENTS - Critical for pricing
+    else if (assetCategory === "Musical Instruments") {
+      if (brandLower.includes('gibson') || brandLower.includes('fender')) {
+        if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture')
+        if (!this.hasSerialNumber(descLower)) missing.push('Serial number for verification')
+        if (!this.hasGuitarCondition(descLower)) missing.push('Condition details (e.g., "fret wear", "finish condition")')
+      } else if (brandLower.includes('steinway') || this.isPiano(assetBrand, assetModel)) {
+        if (!this.hasPianoDetails(descLower)) missing.push('Piano details (e.g., "grand", "upright", "size", "serial number")')
+        if (!this.hasMaintenanceHistory(descLower)) missing.push('Maintenance history (e.g., "recently tuned", "needs work")')
+      } else {
+        if (!this.hasYearInfo(descLower)) missing.push('Year of manufacture')
+        if (!this.hasInstrumentCondition(descLower)) missing.push('Playing condition and maintenance status')
+      }
+    }
+
+    // FINE JEWELRY - Detailed specs for accurate pricing
     else if (assetCategory === "Fine Jewelry" || this.isFineJewelry(assetBrand)) {
-      if (!this.hasMetalType(descLower)) {
-        missing.push('Metal type (e.g., "18k gold", "platinum", "sterling silver")')
+      if (!this.hasMetalType(descLower)) missing.push('Metal type (e.g., "18k gold", "platinum", "sterling silver")')
+      if (this.isDiamondJewelry(assetModel, assetDescription)) {
+        if (!this.hasDiamondSpecs(descLower)) missing.push('Diamond specifications (e.g., "1.5 carat", "VVS1 clarity", "color grade")')
       }
-      if (this.isDiamondJewelry(assetModel, assetDescription) && !this.hasDiamondSpecs(descLower)) {
-        missing.push('Diamond specifications (e.g., "1.5 carat", "VVS1 clarity")')
-      }
-      if (!this.hasJewelrySize(descLower)) {
-        missing.push('Size information (e.g., "ring size 6", "bracelet 7 inches")')
-      }
+      if (!this.hasJewelrySize(descLower)) missing.push('Size information (e.g., "ring size 6", "bracelet 7 inches")')
+      if (!this.hasAuthenticity(descLower)) missing.push('Authenticity (e.g., "certificate", "appraisal", "original purchase")')
     }
 
-    // Designer Handbags - only high-value ones need details
+    // DESIGNER HANDBAGS - Brand-specific requirements
     else if (assetCategory === "Designer Handbags") {
       if (brandLower.includes('hermes') && (modelLower.includes('birkin') || modelLower.includes('kelly'))) {
         if (!this.hasHandbagSize(descLower)) missing.push('Size (e.g., "25cm", "30cm", "35cm")')
         if (!this.hasLeatherType(descLower)) missing.push('Leather type (e.g., "Togo", "Clemence", "Epsom")')
         if (!this.hasHardware(descLower)) missing.push('Hardware (e.g., "gold hardware", "palladium hardware")')
+        if (!this.hasAuthenticity(descLower)) missing.push('Authenticity documentation')
+      } else {
+        if (!this.hasHandbagSize(descLower)) missing.push('Size (e.g., "small", "medium", "large")')
+        if (!this.hasColor(descLower)) missing.push('Color')
+        if (!this.hasHandbagCondition(descLower)) missing.push('Condition details (e.g., "corners", "interior", "handles")')
       }
     }
 
-    // Premium Electronics - Apple products need specs
-    else if (brandLower.includes('apple')) {
-      if (modelLower.includes('iphone')) {
-        if (!this.hasStorageCapacity(descLower)) missing.push('Storage capacity (e.g., "128GB", "256GB")')
-        if (!this.hasCarrierInfo(descLower)) missing.push('Carrier status (e.g., "unlocked", "Verizon")')
-        if (!this.hasYearInfo(descLower)) missing.push('Year or generation (e.g., "iPhone 15", "2023")')
-      } else if (modelLower.includes('macbook')) {
-        if (!this.hasSpecifications(descLower)) missing.push('Specifications (e.g., "M2 chip", "16GB RAM")')
-        if (!this.hasScreenSize(descLower)) missing.push('Screen size (e.g., "13-inch", "16-inch")')
-        if (!this.hasYearInfo(descLower)) missing.push('Year or generation')
+    // ART & ANTIQUES - Authentication critical
+    else if (assetCategory === "Art" || assetCategory === "Antiques") {
+      if (!this.hasArtistInfo(descLower)) missing.push('Artist information (e.g., "signed", "attributed to", "school of")')
+      if (!this.hasDimensions(descLower)) missing.push('Dimensions (e.g., "24x36 inches", "oil on canvas")')
+      if (!this.hasProvenance(descLower)) missing.push('Provenance (e.g., "estate sale", "gallery purchase", "family collection")')
+      if (!this.hasAuthenticity(descLower)) missing.push('Authentication (e.g., "certificate", "appraisal", "expert opinion")')
+    }
+
+    // TOOLS - Professional vs Consumer pricing varies greatly
+    else if (assetCategory === "Tools") {
+      if (this.isProfessionalTool(assetBrand)) {
+        if (!this.hasToolCondition(descLower)) missing.push('Working condition (e.g., "calibrated", "needs service")')
+        if (!this.hasAccessories(descLower)) missing.push('Included accessories and cases')
+        if (!this.hasYearInfo(descLower)) missing.push('Age or purchase year')
       }
+    }
+
+    // FURNITURE - Size and condition critical
+    else if (assetCategory === "Furniture") {
+      if (!this.hasDimensions(descLower)) missing.push('Dimensions (e.g., "72x36x30 inches")')
+      if (!this.hasFurnitureCondition(descLower)) missing.push('Condition details (e.g., "scratches", "upholstery condition")')
+      if (!this.hasMaterial(descLower)) missing.push('Material (e.g., "solid wood", "leather", "fabric type")')
     }
 
     if (missing.length > 0) {
@@ -371,7 +499,7 @@ class AssetValuationService {
   private hasYearInfo(desc: string): boolean {
     return /\b(19|20)\d{2}\b/.test(desc) || 
            /\b(vintage|new|recent|latest|current)\b/.test(desc) ||
-           /\b(m[1-3]|gen|generation)\b/.test(desc)
+           /\b(m[1-3]|gen|generation)\b/i.test(desc)
   }
 
   private hasReferenceNumber(desc: string): boolean {
@@ -440,6 +568,230 @@ class AssetValuationService {
 
   private hasScreenSize(desc: string): boolean {
     return /\b\d+[\.\-]?\d*\s*inch/i.test(desc)
+  }
+
+  // Vehicle-specific detection and validation methods
+  private isVehicle(brand: string, model: string): boolean {
+    const vehicleBrands = ['ford', 'chevrolet', 'toyota', 'honda', 'nissan', 'bmw', 'mercedes', 'audi', 'lexus', 'acura', 'infiniti', 'cadillac', 'tesla', 'porsche', 'ferrari', 'lamborghini', 'maserati', 'bentley', 'rolls-royce', 'jaguar', 'land rover', 'volvo', 'subaru', 'mazda', 'mitsubishi', 'hyundai', 'kia', 'volkswagen']
+    const vehicleTerms = ['car', 'truck', 'suv', 'sedan', 'coupe', 'convertible', 'hatchback', 'wagon', 'pickup', 'van', 'minivan']
+    
+    const brandLower = brand.toLowerCase()
+    const modelLower = model.toLowerCase()
+    
+    return vehicleBrands.some(v => brandLower.includes(v)) || 
+           vehicleTerms.some(v => modelLower.includes(v))
+  }
+
+  private hasMileage(desc: string): boolean {
+    return /\b\d+[,\d]*\s*(miles|km|kilometers)\b/i.test(desc) ||
+           /\b(low|high|mileage)\b/i.test(desc) ||
+           /\b\d+k\s*miles\b/i.test(desc)
+  }
+
+  private hasEngineInfo(desc: string): boolean {
+    return /\b(v\d|engine|cylinder|turbo|hybrid|electric|gas|diesel)\b/i.test(desc) ||
+           /\b\d+[\.\d]*\s*l(iter)?\b/i.test(desc)
+  }
+
+  private hasTransmission(desc: string): boolean {
+    return /\b(manual|automatic|cvt|transmission|stick|shift)\b/i.test(desc)
+  }
+
+  private hasVehicleCondition(desc: string): boolean {
+    return /\b(title|accident|maintenance|service|records|history|damage)\b/i.test(desc) ||
+           /\b(clean|salvage|rebuilt|flood|lemon)\b/i.test(desc)
+  }
+
+  // Motorcycle-specific methods
+  private isMotorcycle(brand: string, model: string): boolean {
+    const motorcycleBrands = ['harley', 'davidson', 'yamaha', 'honda', 'kawasaki', 'suzuki', 'ducati', 'bmw', 'triumph', 'ktm', 'indian']
+    const motorcycleTerms = ['motorcycle', 'bike', 'cruiser', 'sportbike', 'touring', 'chopper', 'scooter']
+    
+    const brandLower = brand.toLowerCase()
+    const modelLower = model.toLowerCase()
+    
+    return motorcycleBrands.some(m => brandLower.includes(m)) ||
+           motorcycleTerms.some(m => modelLower.includes(m))
+  }
+
+  private hasEngineSize(desc: string): boolean {
+    return /\b\d+cc\b/i.test(desc) || /\b\d+[\.\d]*\s*liter\b/i.test(desc)
+  }
+
+  private hasModifications(desc: string): boolean {
+    return /\b(stock|original|modified|aftermarket|custom|exhaust|intake)\b/i.test(desc)
+  }
+
+  // Collectibles methods
+  private isCollectible(brand: string, model: string): boolean {
+    const collectibleTerms = ['pokemon', 'magic', 'yu-gi-oh', 'baseball', 'football', 'basketball', 'comic', 'card', 'vintage', 'collectible', 'rare', 'limited edition']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return collectibleTerms.some(term => combined.includes(term))
+  }
+
+  private isPokemonCard(brand: string, model: string): boolean {
+    const combined = `${brand} ${model}`.toLowerCase()
+    return combined.includes('pokemon') || combined.includes('pikachu') || combined.includes('charizard')
+  }
+
+  private isTradingCard(brand: string, model: string): boolean {
+    const tradingCardTerms = ['topps', 'panini', 'upper deck', 'fleer', 'donruss', 'baseball card', 'football card', 'basketball card']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return tradingCardTerms.some(term => combined.includes(term))
+  }
+
+  private isComic(brand: string, model: string): boolean {
+    const comicTerms = ['comic', 'marvel', 'dc', 'batman', 'superman', 'spider-man', 'x-men']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return comicTerms.some(term => combined.includes(term))
+  }
+
+  private hasCardGrade(desc: string): boolean {
+    return /\b(psa|bgs|cgc|sgc)\s*\d+/i.test(desc) || /\bungraded\b/i.test(desc) || /\braw\b/i.test(desc)
+  }
+
+  private hasCardSet(desc: string): boolean {
+    return /\b(base set|1st edition|unlimited|shadowless|first edition)\b/i.test(desc) ||
+           /\b(set|series|collection)\b/i.test(desc)
+  }
+
+  private hasCardNumber(desc: string): boolean {
+    return /#\d+/i.test(desc) || /\bcard #/i.test(desc)
+  }
+
+  private hasComicGrade(desc: string): boolean {
+    return /\b(cgc|cbcs)\s*\d+[\.\d]*/i.test(desc) || /\bungraded\b/i.test(desc) || /\braw\b/i.test(desc)
+  }
+
+  private hasIssueNumber(desc: string): boolean {
+    return /#\d+/i.test(desc) || /\bissue\s*\d+/i.test(desc) || /\bvol/i.test(desc)
+  }
+
+  private hasCollectibleCondition(desc: string): boolean {
+    return desc.length > 30 && /\b(mint|near mint|excellent|good|fair|poor|box|package|sealed)\b/i.test(desc)
+  }
+
+  private hasAuthenticity(desc: string): boolean {
+    return /\b(authentic|certificate|coa|appraisal|verified|genuine|original)\b/i.test(desc)
+  }
+
+  // Sports Equipment methods
+  private isSportsEquipment(brand: string, model: string): boolean {
+    const sportsTerms = ['golf', 'tennis', 'basketball', 'football', 'baseball', 'hockey', 'soccer', 'fitness', 'exercise', 'gym', 'workout']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return sportsTerms.some(term => combined.includes(term))
+  }
+
+  private isGolfEquipment(brand: string, model: string): boolean {
+    const golfTerms = ['golf', 'driver', 'iron', 'putter', 'wedge', 'titleist', 'callaway', 'ping', 'taylormade']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return golfTerms.some(term => combined.includes(term))
+  }
+
+  private isFitnessEquipment(brand: string, model: string): boolean {
+    const fitnessTerms = ['treadmill', 'elliptical', 'bike', 'weights', 'dumbbells', 'barbell', 'bench', 'rack']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return fitnessTerms.some(term => combined.includes(term))
+  }
+
+  private hasGolfSpecs(desc: string): boolean {
+    return /\b(loft|shaft|flex|grip|degree|iron|driver|putter)\b/i.test(desc)
+  }
+
+  private hasUsageLevel(desc: string): boolean {
+    return /\b(new|used|barely|hardly|well-maintained|good condition|excellent)\b/i.test(desc)
+  }
+
+  private hasWeight(desc: string): boolean {
+    return /\b\d+\s*(lbs?|pounds?|kg|kilograms?)\b/i.test(desc)
+  }
+
+  // Gaming and Electronics methods
+  private isGamingConsole(brand: string, model: string): boolean {
+    const gamingTerms = ['playstation', 'xbox', 'nintendo', 'ps5', 'ps4', 'switch', 'console']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return gamingTerms.some(term => combined.includes(term))
+  }
+
+  private isCamera(brand: string, model: string): boolean {
+    const cameraTerms = ['camera', 'canon', 'nikon', 'sony', 'leica', 'fujifilm', 'olympus', 'pentax']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return cameraTerms.some(term => combined.includes(term))
+  }
+
+  private hasProcessorInfo(desc: string): boolean {
+    return /\b(m\d|intel|amd|processor|cpu|chip|core)\b/i.test(desc)
+  }
+
+  private hasRAM(desc: string): boolean {
+    return /\b\d+gb\s*(ram|memory)\b/i.test(desc) || /\b(8gb|16gb|32gb|64gb)\b/i.test(desc)
+  }
+
+  private hasControllerInfo(desc: string): boolean {
+    return /\b(controller|controllers|accessories|cables|games)\b/i.test(desc)
+  }
+
+  // Musical Instrument methods
+  private isPiano(brand: string, model: string): boolean {
+    const pianoTerms = ['piano', 'grand', 'upright', 'keyboard', 'digital piano']
+    const combined = `${brand} ${model}`.toLowerCase()
+    return pianoTerms.some(term => combined.includes(term))
+  }
+
+  private hasGuitarCondition(desc: string): boolean {
+    return /\b(fret|neck|finish|pickup|bridge|nut|inlay|electronics)\b/i.test(desc)
+  }
+
+  private hasPianoDetails(desc: string): boolean {
+    return /\b(grand|upright|baby|concert|studio|digital|serial|size)\b/i.test(desc)
+  }
+
+  private hasMaintenanceHistory(desc: string): boolean {
+    return /\b(tuned|serviced|maintained|restored|rebuilt|needs work)\b/i.test(desc)
+  }
+
+  private hasInstrumentCondition(desc: string): boolean {
+    return desc.length > 20 && /\b(plays|sounds|condition|maintenance|repair|working)\b/i.test(desc)
+  }
+
+  // Art and design methods
+  private hasArtistInfo(desc: string): boolean {
+    return /\b(signed|unsigned|attributed|school of|style of|after|artist)\b/i.test(desc)
+  }
+
+  private hasDimensions(desc: string): boolean {
+    return /\b\d+\s*[x×]\s*\d+/i.test(desc) || /\b\d+\s*(inch|inches|cm|centimeters)\b/i.test(desc)
+  }
+
+  private hasProvenance(desc: string): boolean {
+    return /\b(estate|gallery|auction|collection|family|inherited|purchased)\b/i.test(desc)
+  }
+
+  private hasColor(desc: string): boolean {
+    return /\b(black|white|brown|red|blue|green|gold|silver|pink|purple|gray|beige|tan|navy|yellow|orange)\b/i.test(desc)
+  }
+
+  private hasHandbagCondition(desc: string): boolean {
+    return /\b(corner|handle|interior|exterior|wear|scratch|stain|zipper|clasp)\b/i.test(desc)
+  }
+
+  // Tool methods
+  private isProfessionalTool(brand: string): boolean {
+    const professionalBrands = ['snap-on', 'mac tools', 'festool', 'milwaukee', 'dewalt', 'makita', 'bosch', 'hilti']
+    return professionalBrands.some(brand_name => brand.toLowerCase().includes(brand_name))
+  }
+
+  private hasToolCondition(desc: string): boolean {
+    return /\b(calibrated|working|tested|functional|needs service|repair)\b/i.test(desc)
+  }
+
+  // Furniture methods
+  private hasFurnitureCondition(desc: string): boolean {
+    return /\b(scratch|dent|stain|upholstery|fabric|leather|wood|refinished)\b/i.test(desc)
+  }
+
+  private hasMaterial(desc: string): boolean {
+    return /\b(wood|metal|plastic|leather|fabric|glass|steel|aluminum|oak|pine|mahogany)\b/i.test(desc)
   }
 
   private isSimpleConsumerGood(assetData: any): boolean {
@@ -1068,4 +1420,23 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-} 
+
+  // Additional helper methods that were referenced but missing
+  private hasShutterCount(desc: string): boolean {
+    return /\b(shutter|count|shots|clicks|usage|actuations)\b/i.test(desc) ||
+           /\b\d+k?\s*(shots|clicks)\b/i.test(desc)
+  }
+
+  private hasLensInfo(desc: string): boolean {
+    return /\b(lens|mm|body only|kit|zoom|prime)\b/i.test(desc)
+  }
+
+  private hasAccessories(desc: string): boolean {
+    return /\b(charger|cable|case|bag|memory|card|battery|manual|accessories|included)\b/i.test(desc)
+  }
+
+  private hasSerialNumber(desc: string): boolean {
+    return /\b(serial|s\/n|sn)\b/i.test(desc) ||
+           /\b[a-z]?\d{6,}\b/i.test(desc)
+  }
+}
