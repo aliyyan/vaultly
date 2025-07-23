@@ -173,13 +173,24 @@ function QuoteContent() {
   }
 
   if (error) {
+    const isValidationError = error.includes('Brand') || 
+                            error.includes('not recognized') || 
+                            error.includes('not found') ||
+                            error.includes('Invalid product') ||
+                            error.includes('Product validation failed')
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
         <div className="container mx-auto py-16 max-w-4xl">
           <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">Quote Generation Error</h1>
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              {isValidationError ? 'Product Not Found' : 'Quote Generation Error'}
+            </h1>
             <p className="text-xl text-gray-600">
-              We encountered an issue generating your quote
+              {isValidationError 
+                ? "We couldn't find this product in our database" 
+                : "We encountered an issue generating your quote"
+              }
             </p>
           </div>
 
@@ -191,27 +202,47 @@ function QuoteContent() {
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-red-900">Unable to Generate Quote</h3>
-                  <p className="text-red-700 bg-red-50 border border-red-200 rounded-lg p-4">
-                    {error}
-                  </p>
+                  <h3 className="text-2xl font-bold text-red-900">
+                    {isValidationError ? 'Invalid Product Information' : 'Unable to Generate Quote'}
+                  </h3>
+                  
+                  {isValidationError ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-left">
+                      <h4 className="font-bold text-amber-800 mb-3">Please check your product details:</h4>
+                      <ul className="text-amber-700 space-y-2 list-disc list-inside text-sm">
+                        <li>Make sure the <strong>brand name</strong> is spelled correctly</li>
+                        <li>Verify the <strong>model name</strong> matches the actual product</li>
+                        <li>Ensure the product exists and is available for sale</li>
+                        <li>Check that the brand matches the selected category</li>
+                      </ul>
+                      <p className="text-amber-600 mt-4 text-sm font-medium">
+                        We only provide quotes for genuine, verifiable products from recognized brands.
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-red-700 bg-red-50 border border-red-200 rounded-lg p-4">
+                      {error}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex gap-4 justify-center">
-                  <Button 
-                    onClick={generateQuote}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-                  >
-                    <RefreshCw className="w-5 h-5 mr-2" />
-                    Try Again
-                  </Button>
                   <Button 
                     variant="outline"
                     onClick={() => router.push('/apply')}
                     className="px-8 py-3"
                   >
-                    Back to Application
+                    {isValidationError ? 'Fix Product Information' : 'Back to Application'}
                   </Button>
+                  {!isValidationError && (
+                    <Button 
+                      onClick={generateQuote}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+                    >
+                      <RefreshCw className="w-5 h-5 mr-2" />
+                      Try Again
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>

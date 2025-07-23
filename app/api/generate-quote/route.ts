@@ -14,6 +14,12 @@ class AssetValuationService {
   }> {
     const { assetCategory, assetBrand, assetModel, assetCondition } = assetData
     
+    // First, validate that this is a real product
+    const validationResult = await this.validateProduct(assetData)
+    if (!validationResult.isValid) {
+      throw new Error(validationResult.reason || 'Product not found in our database')
+    }
+    
     let baseValue = 0
     let sources: string[] = []
     let confidence = 75
@@ -56,6 +62,148 @@ class AssetValuationService {
     }
 
     return { marketValue: baseValue, sources, confidence, notes }
+  }
+
+  private async validateProduct(assetData: any): Promise<{isValid: boolean, reason?: string}> {
+    const { assetCategory, assetBrand, assetModel } = assetData
+    
+    // Step 1: Basic input validation
+    if (!assetBrand || assetBrand.length < 2) {
+      return { isValid: false, reason: 'Brand name too short or invalid' }
+    }
+    
+    if (!assetModel || assetModel.length < 2) {
+      return { isValid: false, reason: 'Model name too short or invalid' }
+    }
+
+    // Step 2: Check for obvious gibberish (random characters)
+    const hasRandomPattern = this.detectRandomText(assetBrand) || this.detectRandomText(assetModel)
+    if (hasRandomPattern) {
+      return { isValid: false, reason: 'Invalid product information detected' }
+    }
+
+    // Step 3: Category-specific validation
+    const categoryValidation = await this.validateByCategory(assetData)
+    if (!categoryValidation.isValid) {
+      return categoryValidation
+    }
+
+    // Step 4: Try to find evidence the product exists
+    const existenceCheck = await this.checkProductExists(assetData)
+    if (!existenceCheck.isValid) {
+      return existenceCheck
+    }
+
+    return { isValid: true }
+  }
+
+  private detectRandomText(text: string): boolean {
+    if (!text || text.length < 3) return false
+    
+    // Check for patterns that suggest random typing
+    const randomPatterns = [
+      /^[aeiou]{3,}$/i,        // All vowels: "aeiou"
+      /^[bcdfg-np-tv-z]{4,}$/i, // All consonants: "bcdfg"  
+      /(.)\1{3,}/i,            // Repeated chars: "aaaa", "bbbb"
+      /^[qwerty]{4,}$/i,       // Keyboard row: "qwerty"
+      /^[asdf]{3,}$/i,         // Keyboard pattern: "asdf"
+      /^[zxcv]{3,}$/i,         // Keyboard pattern: "zxcv"
+      /^[123456789]{3,}$/,     // Number sequence: "123456"
+      /^test|^sample|^demo/i,  // Test words
+      /^[a-z]{1}[0-9]{3,}$/i,  // Single letter + numbers: "a123"
+    ]
+    
+    return randomPatterns.some(pattern => pattern.test(text.trim()))
+  }
+
+  private async validateByCategory(assetData: any) {
+    const { assetCategory, assetBrand, assetModel } = assetData
+    
+    const knownBrands: { [key: string]: string[] } = {
+      "Luxury Watches": [
+        "rolex", "patek philippe", "audemars piguet", "omega", "cartier", 
+        "breitling", "tag heuer", "tudor", "iwc", "jaeger-lecoultre",
+        "vacheron constantin", "a. lange & sohne", "hublot", "panerai", "zenith"
+      ],
+      "Fine Jewelry": [
+        "tiffany", "cartier", "bulgari", "van cleef", "harry winston",
+        "graff", "chopard", "boucheron", "piaget", "mikimoto", "david yurman"
+      ],
+      "Designer Handbags": [
+        "hermes", "chanel", "louis vuitton", "gucci", "prada", "dior",
+        "balenciaga", "saint laurent", "bottega veneta", "fendi", "celine"
+      ],
+      "Premium Electronics": [
+        "apple", "samsung", "canon", "nikon", "sony", "panasonic",
+        "microsoft", "dell", "hp", "lenovo", "asus", "bose", "bang & olufsen"
+      ],
+      "Musical Instruments": [
+        "gibson", "fender", "martin", "taylor", "yamaha", "steinway",
+        "baldwin", "kawai", "stradivarius", "selmer", "bach"
+      ],
+      "Photography Equipment": [
+        "canon", "nikon", "sony", "leica", "fujifilm", "olympus",
+        "pentax", "hasselblad", "mamiya", "zeiss", "sigma", "tamron"
+      ]
+    }
+
+    const categoryBrands = knownBrands[assetCategory] || []
+    if (categoryBrands.length > 0) {
+      const brandFound = categoryBrands.some(brand => 
+        assetBrand.toLowerCase().includes(brand) || brand.includes(assetBrand.toLowerCase())
+      )
+      
+      if (!brandFound) {
+        return { 
+          isValid: false, 
+          reason: `Brand "${assetBrand}" not recognized in ${assetCategory} category` 
+        }
+      }
+    }
+
+    return { isValid: true }
+  }
+
+  private async checkProductExists(assetData: any) {
+    try {
+      // Quick search to see if product has any online presence
+      const query = `${assetData.assetBrand} ${assetData.assetModel}`.trim()
+      
+      // Use a simple fetch to check if Google finds anything about this product
+      const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_API_KEY}&cx=${process.env.GOOGLE_CSE_ID}&q=${encodeURIComponent(query + ' price buy')}&num=3`
+      
+      const response = await fetch(searchUrl)
+      
+      if (response.ok) {
+        const data = await response.json()
+        const items = data.items || []
+        
+        if (items.length === 0) {
+          return { isValid: false, reason: 'No results found for this product online' }
+        }
+        
+        // Check if results seem relevant (contain brand/model words)
+        const relevantResults = items.filter((item: any) => {
+          const title = (item.title || '').toLowerCase()
+          const snippet = (item.snippet || '').toLowerCase()
+          const brandLower = assetData.assetBrand.toLowerCase()
+          const modelLower = assetData.assetModel.toLowerCase()
+          
+          return (title.includes(brandLower) || snippet.includes(brandLower)) &&
+                 (title.includes(modelLower) || snippet.includes(modelLower))
+        })
+        
+        if (relevantResults.length === 0) {
+          return { isValid: false, reason: 'Product information does not match online listings' }
+        }
+      }
+      
+      return { isValid: true }
+    } catch (error) {
+      // If API fails, fall back to brand validation only
+      console.log('Product existence check failed, using brand validation:', error)
+      return { isValid: true }
+    }
   }
 
   private async searchEbayAPI(assetData: any) {
@@ -366,7 +514,16 @@ export async function POST(request: NextRequest) {
 
     // Generate quote using AI valuation service
     const valuationService = new AssetValuationService()
-    const quoteResult = await valuationService.generateQuote(sessionId, assetData)
+    
+    let quoteResult
+    try {
+      quoteResult = await valuationService.generateQuote(sessionId, assetData)
+    } catch (validationError) {
+      return NextResponse.json(
+        { error: validationError instanceof Error ? validationError.message : 'Product validation failed' },
+        { status: 400 }
+      )
+    }
 
     // Save quote to database
     const supabase = createClient(supabaseUrl, supabaseKey)
