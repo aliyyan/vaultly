@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -13,35 +14,62 @@ import Link from "next/link"
 import { createAssetApplication } from "@/lib/supabase"
 
 export default function ApplyPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const [applicationId, setApplicationId] = useState<number | null>(null)
-  const [formData, setFormData] = useState({
-    // Personal Information
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    
-    // Asset Information
-    assetCategory: "",
-    assetBrand: "",
-    assetModel: "",
-    assetCondition: "",
-    estimatedValue: "",
-    assetDescription: "",
-    
-    // Legal Acknowledgments
-    saleAcknowledgment: false,
-    noLiabilityAcknowledgment: false,
-    marketRiskAcknowledgment: false,
-    kycConsent: false,
-    termsAgreement: false
+  const [needsMoreInfo, setNeedsMoreInfo] = useState(false)
+
+  // Initialize form data from URL params if available (when returning from quote page)
+  const [formData, setFormData] = useState(() => {
+    const firstName = searchParams.get('firstName') || ""
+    const lastName = searchParams.get('lastName') || ""
+    const email = searchParams.get('email') || ""
+    const phone = searchParams.get('phone') || ""
+    const address = searchParams.get('address') || ""
+    const city = searchParams.get('city') || ""
+    const state = searchParams.get('state') || ""
+    const zipCode = searchParams.get('zipCode') || ""
+    const assetCategory = searchParams.get('assetCategory') || ""
+    const assetBrand = searchParams.get('assetBrand') || ""
+    const assetModel = searchParams.get('assetModel') || ""
+    const assetCondition = searchParams.get('assetCondition') || ""
+    const estimatedValue = searchParams.get('estimatedValue') || ""
+    const assetDescription = searchParams.get('assetDescription') || ""
+    const needsMoreInfoFlag = searchParams.get('needsMoreInfo') === 'true'
+
+    if (needsMoreInfoFlag) {
+      setNeedsMoreInfo(true)
+    }
+
+    return {
+      // Personal Information
+      firstName,
+      lastName,
+      email,
+      phone,
+      address,
+      city,
+      state,
+      zipCode,
+      
+      // Asset Information
+      assetCategory,
+      assetBrand,
+      assetModel,
+      assetCondition,
+      estimatedValue,
+      assetDescription,
+      
+      // Legal Acknowledgments
+      saleAcknowledgment: false,
+      noLiabilityAcknowledgment: false,
+      marketRiskAcknowledgment: false,
+      kycConsent: false,
+      termsAgreement: false
+    }
   })
 
   const fundingByCategory = [
@@ -408,15 +436,28 @@ export default function ApplyPage() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="assetDescription">Detailed Description</Label>
+                  <Label htmlFor="assetDescription">
+                    Detailed Description 
+                    {needsMoreInfo && <span className="text-red-500 font-bold"> *Required for accurate quote</span>}
+                  </Label>
                   <Textarea
                     id="assetDescription"
                     value={formData.assetDescription}
                     onChange={(e) => handleInputChange('assetDescription', e.target.value)}
-                    className="mt-2"
+                    className={`mt-2 ${needsMoreInfo ? 'border-red-500 border-2 ring-2 ring-red-200' : ''}`}
                     rows={4}
-                    placeholder="Include any relevant details like serial numbers, purchase date, included accessories, etc."
+                    placeholder={needsMoreInfo 
+                      ? "Please add the specific details requested for your item (year, model specifics, condition details, etc.)"
+                      : "Include any relevant details like serial numbers, purchase date, included accessories, etc."
+                    }
                   />
+                  {needsMoreInfo && (
+                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-red-700 text-sm font-medium">
+                        💡 Add the missing information here to get your accurate quote
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -437,8 +478,18 @@ export default function ApplyPage() {
                 <ArrowRight className="w-6 h-6 ml-3" />
               </Button>
               <p className="text-sm text-gray-500 mt-4">
-                Next: AI-powered market research and instant quote
+                {needsMoreInfo 
+                  ? "Next: Get your accurate quote with the additional details"
+                  : "Next: AI-powered market research and instant quote"
+                }
               </p>
+              {needsMoreInfo && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-md mx-auto">
+                  <p className="text-blue-800 text-sm font-medium text-center">
+                    ✅ Your information has been saved. Just add the missing details above and click "Get Instant Quote" again.
+                  </p>
+                </div>
+              )}
             </div>
           </form>
         </div>

@@ -106,6 +106,29 @@ function QuoteContent() {
     router.push('/')
   }
 
+  const handleFixInformation = () => {
+    // Preserve all their previous inputs when going back to fix information
+    const urlParams = new URLSearchParams({
+      firstName: assetData.firstName,
+      lastName: assetData.lastName,
+      email: assetData.email,
+      phone: assetData.phone,
+      address: assetData.address,
+      city: assetData.city,
+      state: assetData.state,
+      zipCode: assetData.zipCode,
+      assetCategory: assetData.assetCategory,
+      assetBrand: assetData.assetBrand,
+      assetModel: assetData.assetModel,
+      assetCondition: assetData.assetCondition,
+      estimatedValue: assetData.estimatedValue,
+      assetDescription: assetData.assetDescription,
+      needsMoreInfo: 'true' // Flag to highlight the description field
+    })
+    
+    router.push(`/apply?${urlParams.toString()}`)
+  }
+
   const getConditionColor = (condition: string) => {
     const colors = {
       'new': 'bg-green-100 text-green-800 border-green-200',
@@ -256,7 +279,7 @@ function QuoteContent() {
                 <div className="flex gap-4 justify-center">
                   <Button 
                     variant="outline"
-                    onClick={() => router.push('/apply')}
+                    onClick={(isValidationError || isInsufficientInfo) ? handleFixInformation : () => router.push('/apply')}
                     className="px-8 py-3"
                   >
                     {(isValidationError || isInsufficientInfo) ? 'Fix Product Information' : 'Back to Application'}
