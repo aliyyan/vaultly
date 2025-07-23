@@ -419,7 +419,7 @@ function QuoteContent() {
                     <li><strong>Payment only after inspection:</strong> No payment until we receive and verify your item</li>
                     <li><strong>Quote may change:</strong> Final offer based on actual condition and authenticity</li>
                     <li><strong>No risk to you:</strong> Item returned free if you decline the final offer</li>
-                    <li><strong>5-day inspection period:</strong> We'll confirm final value within 5 business days</li>
+                    <li><strong>2-day inspection period:</strong> We'll confirm final value within 2 business days</li>
                   </ul>
                 </div>
               </div>

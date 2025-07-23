@@ -196,7 +196,7 @@ function LegalAgreementContent() {
               <p className="mb-2">Payment terms are as follows:</p>
               <ul className="list-disc pl-6 space-y-1 mb-4">
                 <li><strong>No advance payment:</strong> Payment will not be issued until after Buyer receives, inspects, authenticates, and confirms the final value of the Asset.</li>
-                <li><strong>Inspection period:</strong> Buyer has up to 5 business days from receipt to complete full inspection and provide final offer.</li>
+                <li><strong>Inspection period:</strong> Buyer has up to 2 business days from receipt to complete full inspection and provide final offer.</li>
                 <li><strong>Final payment:</strong> If accepted, payment shall be issued within 24 business hours after Seller accepts the final offer via ACH transfer to the bank account provided.</li>
                 <li><strong>Asset return:</strong> If the final offer is declined, the Asset will be returned to Seller within 3 business days at no charge.</li>
               </ul>
