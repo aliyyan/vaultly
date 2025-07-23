@@ -240,21 +240,84 @@ function QuoteContent() {
                   </h3>
                   
                   {isInsufficientInfo ? (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-left">
-                      <h4 className="font-bold text-blue-800 mb-3">For the most accurate quote:</h4>
-                      <div className="bg-white border border-blue-300 rounded-lg p-4 mb-4">
-                        <p className="text-blue-700 font-medium">{infoMessage}</p>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 text-left">
+                      <h4 className="font-bold text-blue-800 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5" />
+                        Specific Information Required for Accurate Quote:
+                      </h4>
+                      
+                      <div className="bg-white border border-blue-300 rounded-lg p-5 mb-4 shadow-sm">
+                        <div className="space-y-3">
+                          {infoMessage.split('\n').map((line, index) => {
+                            if (line.trim() === '') return <div key={index} className="h-2" />
+                            
+                            // Handle bullet points with better styling
+                            if (line.trim().startsWith('•')) {
+                              return (
+                                <div key={index} className="flex items-start gap-3 py-1">
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                  <span className="text-gray-700 text-sm leading-relaxed">
+                                    {line.trim().substring(1).trim()}
+                                  </span>
+                                </div>
+                              )
+                            }
+                            
+                            // Handle headers with icons
+                            if (line.includes('🔍') || line.includes('🚗') || line.includes('💎') || line.includes('📱')) {
+                              return (
+                                <div key={index} className="mt-4 first:mt-0">
+                                  <h5 className="font-bold text-red-800 text-base bg-red-50 p-3 rounded-lg border border-red-200">
+                                    {line.trim()}
+                                  </h5>
+                                </div>
+                              )
+                            }
+                            
+                            // Handle examples with special styling
+                            if (line.trim().startsWith('Example:')) {
+                              return (
+                                <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-4 mt-3">
+                                  <div className="flex items-start gap-2">
+                                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                      <p className="font-semibold text-green-800 text-sm mb-1">Perfect Example:</p>
+                                      <p className="text-green-700 text-sm italic font-medium">
+                                        "{line.replace('Example:', '').trim()}"
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            }
+                            
+                            // Regular descriptive text
+                            return (
+                              <p key={index} className="text-gray-600 text-sm leading-relaxed">
+                                {line.trim()}
+                              </p>
+                            )
+                          })}
+                        </div>
                       </div>
-                      <div className="space-y-2 text-blue-700 text-sm">
-                        <p><strong>💡 How to add this information:</strong></p>
-                        <p>1. Click "Fix Product Information" below</p>
-                        <p>2. Add the requested details to your <strong>Description</strong> field</p>
-                        <p>3. Click "Get Instant Quote" again</p>
-                      </div>
-                      <div className="mt-4 p-3 bg-blue-100 border border-blue-300 rounded-lg">
-                        <p className="text-blue-800 text-sm font-medium">
-                          📊 More details = More accurate pricing
-                        </p>
+                      
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="font-semibold text-green-800 text-sm mb-2">Next Steps:</p>
+                            <ol className="text-sm text-green-700 space-y-1 list-decimal list-inside">
+                              <li>Click "Fix Product Information" below</li>
+                              <li>Add the requested details to your <strong>Description</strong> field</li>
+                              <li>Click "Get Instant Quote" again</li>
+                            </ol>
+                            <div className="mt-3 p-3 bg-blue-100 border border-blue-300 rounded-lg">
+                              <p className="text-blue-800 text-sm font-medium">
+                                📊 More details = More accurate pricing
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ) : isValidationError ? (

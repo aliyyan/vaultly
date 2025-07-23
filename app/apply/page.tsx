@@ -224,6 +224,139 @@ function ApplyPageContent() {
     window.location.href = '/apply/legal-agreement'
   }
 
+  // Helper functions for category-specific guidance
+  const getCategorySpecificGuidance = (category: string, brand: string) => {
+    const brandLower = brand.toLowerCase()
+    
+    if (category === "Luxury Watches") {
+      if (brandLower.includes('rolex')) {
+        return (
+          <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+            <li>Reference number (e.g., 116610LN, 126234)</li>
+            <li>Year of manufacture or purchase</li>
+            <li>Box & papers included?</li>
+            <li>Serial number location and visibility</li>
+            <li>Service history if available</li>
+          </ul>
+        )
+      }
+      if (brandLower.includes('patek') || brandLower.includes('philippe')) {
+        return (
+          <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+            <li>Complete model number (e.g., 5711/1A-010)</li>
+            <li>Year and certificate of origin</li>
+            <li>Case material and dial color</li>
+            <li>Service documentation</li>
+          </ul>
+        )
+      }
+      return (
+        <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+          <li>Model/reference number</li>
+          <li>Year and condition details</li>
+          <li>Box, papers, and certificates</li>
+          <li>Service history if available</li>
+        </ul>
+      )
+    }
+    
+    if (category === "Vehicles") {
+      return (
+        <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+          <li>Year, exact mileage, VIN (last 6 digits)</li>
+          <li>Engine type and transmission</li>
+          <li>Service records and maintenance history</li>
+          <li>Title status and accident history</li>
+          <li>Modifications or aftermarket parts</li>
+        </ul>
+      )
+    }
+    
+    if (category === "Designer Handbags") {
+      if (brandLower.includes('hermes')) {
+        return (
+          <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+            <li>Model and size (e.g., Birkin 30cm)</li>
+            <li>Leather type (Togo, Clemence, Epsom)</li>
+            <li>Hardware color (Gold, Palladium)</li>
+            <li>Date stamp and authenticity cards</li>
+          </ul>
+        )
+      }
+      return (
+        <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+          <li>Model, size, and color</li>
+          <li>Material type and hardware</li>
+          <li>Serial numbers or date codes</li>
+          <li>Authenticity documentation</li>
+        </ul>
+      )
+    }
+    
+    if (category === "Collectibles") {
+      return (
+        <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+          <li>Grading details (PSA, BGS, CGC scores)</li>
+          <li>Set name and card numbers</li>
+          <li>Edition type (1st Edition, Limited)</li>
+          <li>Condition and certification</li>
+        </ul>
+      )
+    }
+    
+    if (category === "Electronics") {
+      if (brandLower.includes('apple')) {
+        return (
+          <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+            <li>Exact model and storage capacity</li>
+            <li>Color and carrier status (if phone)</li>
+            <li>Battery health and screen condition</li>
+            <li>Original accessories and AppleCare+</li>
+          </ul>
+        )
+      }
+      return (
+        <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+          <li>Model number and specifications</li>
+          <li>Age, condition, and functionality</li>
+          <li>Original accessories included</li>
+          <li>Purchase date and warranty status</li>
+        </ul>
+      )
+    }
+    
+    return (
+      <ul className="text-blue-700 text-xs space-y-1 list-disc list-inside">
+        <li>Brand, model, and specifications</li>
+        <li>Age, condition, and functionality</li>
+        <li>Serial numbers or unique identifiers</li>
+        <li>Original accessories and documentation</li>
+      </ul>
+    )
+  }
+
+  const getPlaceholderText = (category: string, brand: string) => {
+    const brandLower = brand.toLowerCase()
+    
+    if (category === "Luxury Watches" && brandLower.includes('rolex')) {
+      return "e.g., 126610LN Submariner, 2023, complete with box and papers, serial S12345, excellent condition"
+    }
+    if (category === "Vehicles") {
+      return "e.g., 2020 BMW M3, 32,000 miles, VIN ending 123456, 3.0L Twin Turbo, Manual, full service records, clean title"
+    }
+    if (category === "Designer Handbags" && brandLower.includes('hermes')) {
+      return "e.g., Birkin 30cm Togo Black with Gold hardware, 2019 T stamp, complete with box and authenticity card"
+    }
+    if (category === "Electronics" && brandLower.includes('apple')) {
+      return "e.g., iPhone 15 Pro 256GB Space Black, Unlocked, 95% battery health, original box and cables"
+    }
+    if (category === "Collectibles") {
+      return "e.g., Charizard Base Set 4/102, 1st Edition, PSA 10, English holo, perfect centering"
+    }
+    
+    return "Include specific details like model numbers, serial numbers, condition, age, accessories, and any unique features"
+  }
+
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -440,22 +573,42 @@ function ApplyPageContent() {
                     Detailed Description 
                     {needsMoreInfo && <span className="text-red-500 font-bold"> *Required for accurate quote</span>}
                   </Label>
+                  
+                  {/* Category-specific guidance */}
+                  {formData.assetCategory && !needsMoreInfo && (
+                    <div className="mt-2 mb-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-semibold text-blue-800 text-sm mb-2">
+                        💡 For the most accurate quote, include:
+                      </h4>
+                      {getCategorySpecificGuidance(formData.assetCategory, formData.assetBrand)}
+                    </div>
+                  )}
+                  
                   <Textarea
                     id="assetDescription"
                     value={formData.assetDescription}
                     onChange={(e) => handleInputChange('assetDescription', e.target.value)}
                     className={`mt-2 ${needsMoreInfo ? 'border-red-500 border-2 ring-2 ring-red-200' : ''}`}
-                    rows={4}
+                    rows={needsMoreInfo ? 6 : 4}
                     placeholder={needsMoreInfo 
-                      ? "Please add the specific details requested for your item (year, model specifics, condition details, etc.)"
-                      : "Include any relevant details like serial numbers, purchase date, included accessories, etc."
+                      ? "Please add the specific details requested for your item (reference numbers, serial numbers, condition details, etc.)"
+                      : getPlaceholderText(formData.assetCategory, formData.assetBrand)
                     }
                   />
                   {needsMoreInfo && (
-                    <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-700 text-sm font-medium">
-                        💡 Add the missing information here to get your accurate quote
-                      </p>
+                    <div className="mt-2 p-3 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-red-700 text-sm font-medium mb-1">
+                            💡 Missing Information Detected
+                          </p>
+                          <p className="text-red-600 text-xs">
+                            Add the specific details shown above to get your accurate quote. 
+                            The more details you provide, the better our AI can price your item.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
