@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import SignatureCanvas from 'react-signature-canvas'
 import { FileText, PenTool, Save, Trash2 } from 'lucide-react'
 
-export default function LegalAgreementPage() {
+function LegalAgreementContent() {
   const sigRef = useRef<SignatureCanvas>(null)
   const searchParams = useSearchParams()
   
@@ -425,5 +425,20 @@ export default function LegalAgreementPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LegalAgreementPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading legal agreement...</p>
+        </div>
+      </div>
+    }>
+      <LegalAgreementContent />
+    </Suspense>
   )
 } 
