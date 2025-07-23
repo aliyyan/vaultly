@@ -621,26 +621,23 @@ function ApplyPageContent() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Camera className="h-5 w-5 text-blue-600" />
-                    Item Photos Required
-                    <Badge variant="destructive">Required</Badge>
+                    Item Photo Required
+                    <Badge className="bg-blue-600">Required</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                      <Camera className="h-5 w-5 text-blue-600 mt-0.5" />
                       <div className="text-sm">
-                        <p className="font-medium text-yellow-800 mb-2">High-Value Item Photo Requirements</p>
-                        <p className="text-yellow-700 mb-2">
-                          Items valued over $500 require {parseFloat(formData.estimatedValue) > 10000 ? '6' : parseFloat(formData.estimatedValue) > 5000 ? '5' : parseFloat(formData.estimatedValue) > 2000 ? '4' : '3'} photos minimum for accurate valuation:
+                        <p className="font-medium text-blue-800 mb-2">Photo Requirement</p>
+                        <p className="text-blue-700 mb-2">
+                          Please upload <strong>1 clear photo</strong> of your item showing:
                         </p>
-                        <ul className="list-disc list-inside space-y-1 text-yellow-700">
-                          <li>Front view showing overall condition</li>
-                          <li>Back/side view with all angles</li>
-                          <li>Serial numbers, model markings, signatures</li>
-                          {parseFloat(formData.estimatedValue) > 2000 && <li>Close-up detail shots of key features</li>}
-                          {parseFloat(formData.estimatedValue) > 5000 && <li>Additional condition/authenticity details</li>}
-                          {parseFloat(formData.estimatedValue) > 10000 && <li>Box, papers, certificates (if available)</li>}
+                        <ul className="list-disc list-inside space-y-1 text-blue-700">
+                          <li>Overall condition and authenticity</li>
+                          <li>Any serial numbers, model markings, or signatures (if visible)</li>
+                          <li>Key identifying features</li>
                         </ul>
                       </div>
                     </div>
@@ -648,9 +645,9 @@ function ApplyPageContent() {
 
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
                     <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-lg font-medium text-gray-600 mb-2">Upload Your Item Photos</p>
+                    <p className="text-lg font-medium text-gray-600 mb-2">Upload Your Item Photo</p>
                     <p className="text-sm text-gray-500 mb-4">
-                      Click to select files or drag and drop images here
+                      Click to select a file or drag and drop an image here
                     </p>
                     <input
                       type="file"
@@ -673,7 +670,7 @@ function ApplyPageContent() {
                       onClick={() => document.getElementById('photo-upload')?.click()}
                       className="border-blue-300 text-blue-600 hover:bg-blue-50"
                     >
-                      Select Photos
+                      Select Photo
                     </Button>
                     <div className="mt-3 text-xs text-gray-400">
                       Supported formats: JPG, PNG, HEIC • Max 10MB per file
@@ -686,7 +683,7 @@ function ApplyPageContent() {
                       <div className="text-sm">
                         <p className="font-medium text-blue-800 mb-1">Photo Security & Privacy</p>
                         <p className="text-blue-700">
-                          Your photos are encrypted and only used for valuation purposes. They are automatically deleted after 30 days unless you complete a transaction.
+                          Your photo is encrypted and only used for valuation purposes. It is automatically deleted after 30 days unless you complete a transaction.
                         </p>
                       </div>
                     </div>

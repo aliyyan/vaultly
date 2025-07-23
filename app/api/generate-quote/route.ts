@@ -104,7 +104,7 @@ class AssetValuationService {
         const minPhotos = this.getMinimumPhotosRequired(assetData)
         return { 
           isValid: false, 
-          reason: `High-value items require ${minPhotos} photos minimum. Please upload photos of your item from multiple angles including serial numbers/authentication markings.` 
+          reason: `Please upload 1 clear photo of your item showing overall condition and any visible serial numbers or identifying markings.` 
         }
       }
       
@@ -979,28 +979,16 @@ class AssetValuationService {
   }
 
   private getMinimumPhotosRequired(assetData: any): number {
-    const { assetCategory, estimatedValue } = assetData
-    const value = parseFloat(estimatedValue) || 0
-    
-    // High-value items need more photos
-    if (value > 10000) return 6
-    if (value > 5000) return 5
-    if (value > 2000) return 4
-    if (value > 500) return 3
-    return 2
+    // Only 1 photo required for all items
+    return 1
   }
 
   private validatePhotoQuality(photos: any[]): string[] {
     const issues: string[] = []
     
-    if (!photos.some(p => p.type === 'front')) {
-      issues.push('Front view photo required')
-    }
-    if (!photos.some(p => p.type === 'back')) {
-      issues.push('Back view photo required')
-    }
-    if (!photos.some(p => p.type === 'serial')) {
-      issues.push('Serial number/authentication photo required')
+    // Only require that at least 1 photo is uploaded
+    if (photos.length === 0) {
+      issues.push('At least 1 photo is required')
     }
     
     return issues
