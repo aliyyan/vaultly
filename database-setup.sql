@@ -88,9 +88,51 @@ INSERT INTO asset_categories (name, max_funding_amount, description) VALUES
 ('Other', 10000.00, 'Art, collectibles, antiques, sports memorabilia')
 ON CONFLICT (name) DO NOTHING;
 
--- 7. Create Legal_documents table (for signed agreements)
+-- 7. Create asset_quotes table (for AI-generated quotes)
+CREATE TABLE IF NOT EXISTS asset_quotes (
+  id BIGSERIAL PRIMARY KEY,
+  -- Application Reference
+  application_session_id TEXT NOT NULL, -- To link to form data before full application
+  
+  -- Asset Details (copied from form)
+  asset_category TEXT NOT NULL,
+  asset_brand TEXT NOT NULL,
+  asset_model TEXT NOT NULL,
+  asset_condition TEXT NOT NULL,
+  user_estimated_value DECIMAL(10,2),
+  asset_description TEXT,
+  
+  -- AI Valuation Data
+  researched_market_value DECIMAL(10,2), -- Value found by AI research
+  valuation_sources TEXT[], -- Array of sources used for research
+  confidence_score INTEGER, -- 1-100 confidence in the valuation
+  condition_adjustment_factor DECIMAL(3,2), -- Multiplier for condition (0.7-1.0)
+  
+  -- Quote Details
+  final_market_value DECIMAL(10,2), -- After condition adjustment
+  quote_amount DECIMAL(10,2), -- Our offer (40% of final_market_value)
+  quote_percentage DECIMAL(3,2) DEFAULT 0.40, -- What percentage of market value we offer
+  buyback_amount DECIMAL(10,2), -- 110% of quote_amount
+  
+  -- Quote Status
+  quote_status TEXT DEFAULT 'pending', -- pending, accepted, declined, expired
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '48 hours',
+  
+  -- Research Details
+  api_responses JSONB, -- Store raw API responses for debugging
+  research_notes TEXT, -- AI analysis notes
+  
+  -- Timestamps
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 8. Create Legal_documents table (for signed agreements)
 CREATE TABLE IF NOT EXISTS Legal_documents (
   id BIGSERIAL PRIMARY KEY,
+  -- Link to quote
+  quote_id BIGINT REFERENCES asset_quotes(id),
+  
   -- Personal Information
   seller_name TEXT NOT NULL,
   seller_email TEXT NOT NULL,
@@ -117,12 +159,13 @@ CREATE TABLE IF NOT EXISTS Legal_documents (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 8. Enable Row Level Security (RLS)
+-- 9. Enable Row Level Security (RLS)
 ALTER TABLE todos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE asset_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE asset_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE asset_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE asset_quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE Legal_documents ENABLE ROW LEVEL SECURITY;
 
 -- 8. Create policies (allowing all operations for development)
@@ -155,6 +198,11 @@ FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Allow all operations on asset_categories" ON asset_categories;
 CREATE POLICY "Allow all operations on asset_categories" ON asset_categories
+FOR ALL USING (true) WITH CHECK (true);
+
+-- Asset quotes policies
+DROP POLICY IF EXISTS "Allow all operations on asset_quotes" ON asset_quotes;
+CREATE POLICY "Allow all operations on asset_quotes" ON asset_quotes
 FOR ALL USING (true) WITH CHECK (true);
 
 -- Legal agreements policies

@@ -157,7 +157,26 @@ export default function ApplyPage() {
     }
     
     setSubmitError("") // Clear any previous errors
-    setStep(2)
+    
+    // Redirect to quote page with form data as URL parameters
+    const urlParams = new URLSearchParams({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      zipCode: formData.zipCode,
+      assetCategory: formData.assetCategory,
+      assetBrand: formData.assetBrand,
+      assetModel: formData.assetModel,
+      assetCondition: formData.assetCondition,
+      estimatedValue: formData.estimatedValue,
+      assetDescription: formData.assetDescription
+    })
+    
+    window.location.href = `/apply/quote?${urlParams.toString()}`
   }
 
   const handleStep2Submit = (e: React.FormEvent) => {
@@ -414,11 +433,11 @@ export default function ApplyPage() {
                 size="lg"
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
               >
-                Continue to Asset Details
+                Get Instant Quote
                 <ArrowRight className="w-6 h-6 ml-3" />
               </Button>
               <p className="text-sm text-gray-500 mt-4">
-                Next: Asset details and legal review
+                Next: AI-powered market research and instant quote
               </p>
             </div>
           </form>

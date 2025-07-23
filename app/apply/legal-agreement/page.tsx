@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,15 +12,38 @@ import { FileText, PenTool, Save, Trash2 } from 'lucide-react'
 
 export default function LegalAgreementPage() {
   const sigRef = useRef<SignatureCanvas>(null)
+  const searchParams = useSearchParams()
+  
+  // Get application data from URL params
+  const applicationData = {
+    firstName: searchParams.get('firstName') || '',
+    lastName: searchParams.get('lastName') || '',
+    email: searchParams.get('email') || '',
+    phone: searchParams.get('phone') || '',
+    address: searchParams.get('address') || '',
+    city: searchParams.get('city') || '',
+    state: searchParams.get('state') || '',
+    zipCode: searchParams.get('zipCode') || '',
+    assetCategory: searchParams.get('assetCategory') || '',
+    assetBrand: searchParams.get('assetBrand') || '',
+    assetModel: searchParams.get('assetModel') || '',
+    assetCondition: searchParams.get('assetCondition') || '',
+    estimatedValue: searchParams.get('estimatedValue') || '',
+    assetDescription: searchParams.get('assetDescription') || '',
+    quoteId: searchParams.get('quoteId') || '',
+    quoteAmount: parseFloat(searchParams.get('quoteAmount') || '0'),
+    buybackAmount: parseFloat(searchParams.get('buybackAmount') || '0')
+  }
+
   const [formData, setFormData] = useState({
-    sellerName: '',
-    sellerEmail: '',
-    sellerPhone: '',
+    sellerName: `${applicationData.firstName} ${applicationData.lastName}`,
+    sellerEmail: applicationData.email,
+    sellerPhone: applicationData.phone,
     bankName: '',
     routingNumber: '',
     accountNumber: '',
     accountType: '',
-    fullNameOnAccount: '',
+    fullNameOnAccount: `${applicationData.firstName} ${applicationData.lastName}`,
     bankAddress: '',
     signatureDate: new Date().toLocaleDateString()
   })
@@ -39,7 +63,17 @@ export default function LegalAgreementPage() {
         
         const completeData = {
           ...formData,
-          signature: signatureData
+          signature: signatureData,
+          // Include quote information
+          quoteId: applicationData.quoteId,
+          quoteAmount: applicationData.quoteAmount,
+          buybackAmount: applicationData.buybackAmount,
+          // Include asset information
+          assetCategory: applicationData.assetCategory,
+          assetBrand: applicationData.assetBrand,
+          assetModel: applicationData.assetModel,
+          assetCondition: applicationData.assetCondition,
+          assetDescription: applicationData.assetDescription
         }
         
         const response = await fetch('/api/legal-agreement/submit', {
@@ -76,12 +110,18 @@ export default function LegalAgreementPage() {
       <div className="container mx-auto max-w-4xl px-4">
         <div className="bg-white rounded-xl shadow-lg">
           {/* Header */}
-          <div className="bg-slate-900 text-white p-6 rounded-t-xl">
-            <div className="flex items-center space-x-3">
-              <FileText className="w-8 h-8" />
-              <div>
-                <h1 className="text-2xl font-bold">Legal Agreement & Digital Signature</h1>
-                <p className="text-slate-300">Asset Purchase and Buyback Agreement</p>
+                        <div className="bg-slate-900 text-white p-6 rounded-t-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <FileText className="w-8 h-8" />
+                <div>
+                  <h1 className="text-2xl font-bold">Legal Agreement & Digital Signature</h1>
+                  <p className="text-slate-300">Asset Purchase and Buyback Agreement</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-xl font-bold text-green-400">${applicationData.quoteAmount.toLocaleString()}</div>
+                <div className="text-sm text-slate-300">Your Accepted Quote</div>
               </div>
             </div>
           </div>
@@ -107,12 +147,29 @@ export default function LegalAgreementPage() {
               </ul>
 
               <h3 className="font-semibold text-lg mt-6 mb-3">2. ASSET DESCRIPTION</h3>
-              <p className="mb-4">The Seller agrees to provide a full and truthful description of the Asset, including make, model, condition, serial numbers, photos, and any relevant identifying information.</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div><strong>Category:</strong> {applicationData.assetCategory}</div>
+                  <div><strong>Brand:</strong> {applicationData.assetBrand}</div>
+                  <div><strong>Model:</strong> {applicationData.assetModel}</div>
+                  <div><strong>Condition:</strong> {applicationData.assetCondition}</div>
+                  <div className="md:col-span-2"><strong>Description:</strong> {applicationData.assetDescription || 'No additional description provided'}</div>
+                </div>
+              </div>
+              <p className="mb-4">The Seller agrees that the above description is accurate and complete to the best of their knowledge.</p>
 
-              <h3 className="font-semibold text-lg mt-6 mb-3">3. BUYBACK OPTION</h3>
+              <h3 className="font-semibold text-lg mt-6 mb-3">3. PURCHASE TERMS & BUYBACK OPTION</h3>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div><strong>Purchase Amount:</strong> ${applicationData.quoteAmount.toLocaleString()}</div>
+                  <div><strong>Buyback Amount:</strong> ${applicationData.buybackAmount.toLocaleString()}</div>
+                  <div><strong>Buyback Period:</strong> 90 calendar days</div>
+                  <div><strong>Quote Expires:</strong> 48 hours from acceptance</div>
+                </div>
+              </div>
               <p className="mb-2">The Seller has the option to repurchase the Asset within 90 calendar days from the date of Buyer's receipt of the Asset ("Buyback Period"). To exercise this right, Seller must:</p>
               <ul className="list-disc pl-6 space-y-1 mb-4">
-                <li>Pay the original purchase amount paid by Buyer,</li>
+                <li>Pay the buyback amount of ${applicationData.buybackAmount.toLocaleString()},</li>
                 <li>Plus any applicable storage, handling, insurance, and processing fees disclosed at the time of sale,</li>
                 <li>Complete the transaction within the Buyback Period.</li>
               </ul>
