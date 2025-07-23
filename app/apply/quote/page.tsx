@@ -329,14 +329,14 @@ function QuoteContent() {
 
         {/* Main Quote Card */}
         <Card className="shadow-2xl border-0 bg-white mb-8">
-          <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white text-center py-8">
+          <CardHeader className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-center py-8">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-white">Your Instant Cash Offer</h2>
+              <h2 className="text-2xl font-bold text-white">Your Preliminary Cash Offer</h2>
               <div className="text-6xl font-bold text-white">
                 ${quoteData.quoteAmount.toLocaleString()}
               </div>
-              <p className="text-green-100 text-lg">
-                Available immediately upon asset verification
+              <p className="text-yellow-100 text-lg">
+                Subject to inspection & authentication
               </p>
             </div>
           </CardHeader>
@@ -409,6 +409,22 @@ function QuoteContent() {
               </div>
             </div>
 
+            {/* Payment Disclaimer */}
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
+              <div className="flex items-start">
+                <AlertTriangle className="w-6 h-6 text-yellow-600 mt-1 mr-4 flex-shrink-0" />
+                <div>
+                  <h4 className="font-bold text-yellow-800 mb-2">IMPORTANT: Preliminary Quote</h4>
+                  <ul className="text-yellow-800 space-y-1 list-disc list-inside text-sm">
+                    <li><strong>Payment only after inspection:</strong> No payment until we receive and verify your item</li>
+                    <li><strong>Quote may change:</strong> Final offer based on actual condition and authenticity</li>
+                    <li><strong>No risk to you:</strong> Item returned free if you decline the final offer</li>
+                    <li><strong>5-day inspection period:</strong> We'll confirm final value within 5 business days</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             {/* Action Buttons */}
             <div className="flex gap-4 justify-center">
               <Button
@@ -416,7 +432,7 @@ function QuoteContent() {
                 size="lg"
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full px-12 py-6 text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-300"
               >
-                Accept Quote & Continue
+                Accept Preliminary Quote
                 <ArrowRight className="w-6 h-6 ml-3" />
               </Button>
               <Button
@@ -431,7 +447,7 @@ function QuoteContent() {
 
             <div className="text-center mt-6">
               <p className="text-sm text-gray-600">
-                This quote is valid for 48 hours. No obligation to proceed.
+                This preliminary quote is valid for 48 hours. Final payment after item inspection.
               </p>
             </div>
           </CardContent>

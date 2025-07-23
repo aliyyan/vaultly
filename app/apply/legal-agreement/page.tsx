@@ -120,8 +120,9 @@ function LegalAgreementContent() {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-xl font-bold text-green-400">${applicationData.quoteAmount.toLocaleString()}</div>
-                <div className="text-sm text-slate-300">Your Accepted Quote</div>
+                <div className="text-xl font-bold text-yellow-400">${applicationData.quoteAmount.toLocaleString()}</div>
+                <div className="text-sm text-slate-300">Preliminary Quote</div>
+                <div className="text-xs text-yellow-200">Subject to inspection</div>
               </div>
             </div>
           </div>
@@ -175,16 +176,31 @@ function LegalAgreementContent() {
               </ul>
               <p className="mb-4">If the Seller fails to repurchase the Asset within the Buyback Period, all rights to the Asset shall irrevocably transfer to the Buyer, and the Seller shall have no further claims.</p>
 
-              <h3 className="font-semibold text-lg mt-6 mb-3">4. INSPECTION & VERIFICATION</h3>
-              <p className="mb-2">This Agreement is contingent upon Buyer's physical inspection and authentication of the Asset. Buyer reserves the right to:</p>
+              <h3 className="font-semibold text-lg mt-6 mb-3">4. INSPECTION & VERIFICATION - QUOTE SUBJECT TO CHANGE</h3>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <p className="font-semibold text-yellow-800 mb-2">IMPORTANT: This quote is preliminary and subject to change upon physical inspection.</p>
+              </div>
+              <p className="mb-2">This Agreement and all quoted amounts are contingent upon Buyer's physical inspection and authentication of the Asset. Buyer reserves the right to:</p>
               <ul className="list-disc pl-6 space-y-1 mb-4">
-                <li>Reject the Asset and return it to Seller if it materially differs from the description or is counterfeit,</li>
-                <li>Adjust the final purchase price if the condition is materially different from what was disclosed,</li>
-                <li>Withhold payment until all verifications are complete.</li>
+                <li><strong>Reject the Asset</strong> and return it to Seller at no cost if it materially differs from the description, is counterfeit, or is not authentic,</li>
+                <li><strong>Adjust the final purchase price</strong> (up or down) if the actual condition, authenticity, or specifications differ from what was disclosed,</li>
+                <li><strong>Provide a revised quote</strong> based on the actual condition and market value after professional assessment,</li>
+                <li><strong>Withhold all payment</strong> until complete inspection, authentication, and final valuation are complete.</li>
               </ul>
+              <p className="mb-4 text-sm text-gray-600">The Seller acknowledges that the quoted amounts may change and agrees to accept the final offer after inspection or retrieve their asset at no charge.</p>
 
-              <h3 className="font-semibold text-lg mt-6 mb-3">5. PAYMENT TERMS</h3>
-              <p className="mb-4">Payment shall be issued to the Seller within 24 business hours after successful receipt and verification of the Asset via ACH transfer to the bank account provided by the Seller. Buyer is not responsible for delays due to incorrect bank information or bank processing times.</p>
+              <h3 className="font-semibold text-lg mt-6 mb-3">5. PAYMENT TERMS - PAYMENT AFTER INSPECTION ONLY</h3>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="font-semibold text-blue-800">NO PAYMENT UNTIL ITEM IS RECEIVED AND VERIFIED</p>
+              </div>
+              <p className="mb-2">Payment terms are as follows:</p>
+              <ul className="list-disc pl-6 space-y-1 mb-4">
+                <li><strong>No advance payment:</strong> Payment will not be issued until after Buyer receives, inspects, authenticates, and confirms the final value of the Asset.</li>
+                <li><strong>Inspection period:</strong> Buyer has up to 5 business days from receipt to complete full inspection and provide final offer.</li>
+                <li><strong>Final payment:</strong> If accepted, payment shall be issued within 24 business hours after Seller accepts the final offer via ACH transfer to the bank account provided.</li>
+                <li><strong>Asset return:</strong> If the final offer is declined, the Asset will be returned to Seller within 3 business days at no charge.</li>
+              </ul>
+              <p className="mb-4">Buyer is not responsible for delays due to incorrect bank information, bank processing times, or shipping delays beyond Buyer's control.</p>
 
               <h3 className="font-semibold text-lg mt-6 mb-3">6. RISK DISCLOSURE</h3>
               <p className="mb-2">The Seller acknowledges that:</p>

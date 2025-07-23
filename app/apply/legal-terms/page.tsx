@@ -17,6 +17,7 @@ function LegalTermsContent() {
     saleAcknowledgment: false,
     noLiabilityAcknowledgment: false,
     marketRiskAcknowledgment: false,
+    noAdvancePayment: false,
     kycConsent: false,
     termsAgreement: false
   })
@@ -110,6 +111,7 @@ function LegalTermsContent() {
     if (!formData.saleAcknowledgment || 
         !formData.noLiabilityAcknowledgment || 
         !formData.marketRiskAcknowledgment || 
+        !formData.noAdvancePayment ||
         !formData.kycConsent || 
         !formData.termsAgreement) {
       setSubmitError("Please check all required acknowledgments before continuing.")
@@ -123,6 +125,7 @@ function LegalTermsContent() {
       saleAcknowledgment: formData.saleAcknowledgment.toString(),
       noLiabilityAcknowledgment: formData.noLiabilityAcknowledgment.toString(),
       marketRiskAcknowledgment: formData.marketRiskAcknowledgment.toString(),
+      noAdvancePayment: formData.noAdvancePayment.toString(),
       kycConsent: formData.kycConsent.toString(),
       termsAgreement: formData.termsAgreement.toString()
     })
@@ -138,12 +141,15 @@ function LegalTermsContent() {
           <p className="text-xl text-gray-600 mb-4">
             Please review and acknowledge the following legal terms
           </p>
-          <div className="bg-green-100 border border-green-300 rounded-lg p-4 max-w-md mx-auto">
-            <p className="text-green-800 font-semibold">
-              Your Quote: ${parseFloat(userData.quoteAmount).toLocaleString()}
+          <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 max-w-md mx-auto">
+            <p className="text-yellow-800 font-semibold">
+              Preliminary Quote: ${parseFloat(userData.quoteAmount).toLocaleString()}
             </p>
-            <p className="text-green-700 text-sm">
+            <p className="text-yellow-700 text-sm">
               Asset: {userData.assetBrand} {userData.assetModel} | Buyback: ${parseFloat(userData.buybackAmount).toLocaleString()}
+            </p>
+            <p className="text-yellow-600 text-xs font-medium mt-1">
+              ⚠️ Final amount subject to inspection & authentication
             </p>
           </div>
         </div>
@@ -154,10 +160,11 @@ function LegalTermsContent() {
             <div className="flex items-start">
               <AlertTriangle className="w-6 h-6 text-amber-600 mt-1 mr-4 flex-shrink-0" />
               <div>
-                <h3 className="font-bold text-amber-800 mb-2">IMPORTANT: This is an Asset Sale, Not a Loan</h3>
+                <h3 className="font-bold text-amber-800 mb-2">IMPORTANT: Asset Sale with Payment After Inspection</h3>
                 <ul className="text-amber-800 space-y-1 list-disc list-inside text-sm">
                   <li>We purchase your asset with full title transfer</li>
-                  <li>You receive immediate cash payment of ${parseFloat(userData.quoteAmount).toLocaleString()}</li>
+                  <li><strong>Payment only after we receive and verify your item</strong></li>
+                  <li>Quote of ${parseFloat(userData.quoteAmount).toLocaleString()} may change based on actual condition</li>
                   <li>Optional 90-day repurchase right (no obligation)</li>
                   <li>No credit checks, no personal liability</li>
                   <li>Available in select states only</li>
@@ -200,8 +207,8 @@ function LegalTermsContent() {
                     onChange={(e) => handleInputChange('noLiabilityAcknowledgment', e.target.checked)}
                   />
                   <label className="text-gray-700">
-                    I understand that <strong>failure to exercise the repurchase option creates no debt or liability</strong> 
-                    and will not affect my credit score. <span className="text-red-500">*</span>
+                    I understand that <strong>payment will only be made after Vaultly receives and inspects my item</strong>, 
+                    and the quoted amount may change based on actual condition and authenticity. <span className="text-red-500">*</span>
                   </label>
                 </div>
                 <div className="flex items-start space-x-3">
@@ -213,8 +220,21 @@ function LegalTermsContent() {
                     onChange={(e) => handleInputChange('marketRiskAcknowledgment', e.target.checked)}
                   />
                   <label className="text-gray-700">
-                    I acknowledge that Vaultly will assume <strong>full market risk</strong> for my asset after the 
-                    repurchase deadline expires. <span className="text-red-500">*</span>
+                    I acknowledge that <strong>this quote is preliminary and subject to change</strong> upon physical inspection. 
+                    Vaultly may adjust the offer up or down or reject the item entirely. <span className="text-red-500">*</span>
+                  </label>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <input 
+                    type="checkbox" 
+                    className="mt-1 w-5 h-5" 
+                    required 
+                    checked={formData.noAdvancePayment || false}
+                    onChange={(e) => handleInputChange('noAdvancePayment', e.target.checked)}
+                  />
+                  <label className="text-gray-700">
+                    I understand that <strong>no payment will be made in advance</strong>. Payment occurs only after 
+                    Vaultly receives, inspects, and confirms the final value of my asset. <span className="text-red-500">*</span>
                   </label>
                 </div>
                 <div className="flex items-start space-x-3">
