@@ -104,7 +104,7 @@ class AssetValuationService {
         const minPhotos = this.getMinimumPhotosRequired(assetData)
         return { 
           isValid: false, 
-          reason: `Please upload 1 clear photo of your item showing overall condition and any visible serial numbers or identifying markings.` 
+          reason: `INSUFFICIENT_INFO: Please upload 1 clear photo of your item showing overall condition and any visible serial numbers or identifying markings.` 
         }
       }
       
@@ -113,7 +113,7 @@ class AssetValuationService {
       if (photoIssues.length > 0) {
         return {
           isValid: false,
-          reason: `Photo requirements not met: ${photoIssues.join(', ')}`
+          reason: `INSUFFICIENT_INFO: Photo requirements not met: ${photoIssues.join(', ')}`
         }
       }
     }
@@ -131,7 +131,10 @@ class AssetValuationService {
     if (value > 1000) {
       const validationResult = this.requiresSpecificDetails(assetData)
       if (!validationResult.isValid) {
-        return validationResult
+        return {
+          isValid: false,
+          reason: `INSUFFICIENT_INFO: ${validationResult.reason}`
+        }
       }
     }
 
