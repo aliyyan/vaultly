@@ -200,7 +200,8 @@ function QuoteContent() {
                             error.includes('not recognized') || 
                             error.includes('not found') ||
                             error.includes('Invalid product') ||
-                            error.includes('Product validation failed')
+                            error.includes('Product validation failed') ||
+                            error.includes('mass-market consumer goods')
     
     const isInsufficientInfo = error.includes('INSUFFICIENT_INFO:')
     const infoMessage = isInsufficientInfo ? error.replace('INSUFFICIENT_INFO: ', '') : ''

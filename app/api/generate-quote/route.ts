@@ -150,6 +150,13 @@ class AssetValuationService {
       "Photography Equipment": [
         "canon", "nikon", "sony", "leica", "fujifilm", "olympus",
         "pentax", "hasselblad", "mamiya", "zeiss", "sigma", "tamron"
+      ],
+      "Other": [
+        "banksy", "picasso", "warhol", "basquiat", "kaws", "obey", "supreme", 
+        "hermes", "louis vuitton", "chanel", "dior", "goyard", "bottega veneta",
+        "richard mille", "jacob & co", "audemars piguet", "patek philippe",
+        "ferrari", "lamborghini", "porsche", "mclaren", "bugatti",
+        "stradivarius", "steinway", "fazioli", "bosendorfer"
       ]
     }
 
@@ -164,6 +171,54 @@ class AssetValuationService {
           isValid: false, 
           reason: `Brand "${assetBrand}" not recognized in ${assetCategory} category` 
         }
+      }
+    }
+
+    // Check for consumer goods that shouldn't be quoted
+    const consumerGoodsCheck = this.validateConsumerGoods(assetData)
+    if (!consumerGoodsCheck.isValid) {
+      return consumerGoodsCheck
+    }
+
+    return { isValid: true }
+  }
+
+  private validateConsumerGoods(assetData: any) {
+    const { assetBrand, assetModel } = assetData
+    const brandLower = assetBrand.toLowerCase()
+    const modelLower = assetModel.toLowerCase()
+
+    // Mass-market brands we don't quote on
+    const consumerBrands = [
+      'nike', 'adidas', 'puma', 'under armour', 'reebok', 'new balance',
+      'champion', 'fila', 'vans', 'converse', 'jordan', 'polo ralph lauren',
+      'tommy hilfiger', 'calvin klein', 'gap', 'old navy', 'target', 
+      'walmart', 'h&m', 'zara', 'uniqlo', 'forever 21', 'shein',
+      'american eagle', 'hollister', 'abercrombie', 'urban outfitters'
+    ]
+
+    // Sports/apparel terms that indicate mass-market items
+    const consumerTerms = [
+      'jersey', 't-shirt', 'tshirt', 'hoodie', 'sweatshirt', 'jeans',
+      'sneakers', 'running shoes', 'basketball shoes', 'cleats',
+      'cap', 'hat', 'beanie', 'socks', 'underwear', 'shorts',
+      'tracksuit', 'joggers', 'leggings', 'sports bra'
+    ]
+
+    // Check if it's a consumer brand
+    const isConsumerBrand = consumerBrands.some(brand => 
+      brandLower.includes(brand) || brand.includes(brandLower)
+    )
+
+    // Check if it's consumer apparel/footwear
+    const isConsumerItem = consumerTerms.some(term => 
+      modelLower.includes(term) || brandLower.includes(term)
+    )
+
+    if (isConsumerBrand || isConsumerItem) {
+      return {
+        isValid: false,
+        reason: `We don't provide quotes for mass-market consumer goods like ${assetBrand} ${assetModel}. We specialize in luxury items, collectibles, and high-value assets.`
       }
     }
 
@@ -844,7 +899,7 @@ class AssetValuationService {
   }
 
   private getFallbackEstimate(assetData: any) {
-    // Conservative fallback estimates by category
+    // Conservative fallback estimates by category - these should only be reached for validated luxury items
     const fallbackValues: { [key: string]: number } = {
       "Luxury Watches": 5000,
       "Fine Jewelry": 2500,
@@ -852,7 +907,7 @@ class AssetValuationService {
       "Premium Electronics": 800,
       "Musical Instruments": 1500,
       "Photography Equipment": 1200,
-      "Other": 1500
+      "Other": 3000 // Higher since this should only be reached for verified luxury collectibles
     }
 
     return fallbackValues[assetData.assetCategory] || 1000
