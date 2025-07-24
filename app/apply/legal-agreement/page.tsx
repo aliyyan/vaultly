@@ -154,7 +154,18 @@ function LegalAgreementContent() {
                   <div><strong>Brand:</strong> {applicationData.assetBrand}</div>
                   <div><strong>Model:</strong> {applicationData.assetModel}</div>
                   <div><strong>Condition:</strong> {applicationData.assetCondition}</div>
-                  <div className="md:col-span-2"><strong>Description:</strong> {applicationData.assetDescription || 'No additional description provided'}</div>
+                  <div className="md:col-span-2">
+                  <strong>Specific Details:</strong>
+                  <div className="mt-1 text-sm text-gray-600">
+                    {/* Parse and display the specific field details from the description */}
+                    {applicationData.assetDescription 
+                      ? applicationData.assetDescription.split('. ').map((detail, index) => (
+                          <div key={index} className="ml-2">• {detail}</div>
+                        ))
+                      : 'No specific details provided'
+                    }
+                  </div>
+                </div>
                 </div>
               </div>
               <p className="mb-4">The Seller agrees that the above description is accurate and complete to the best of their knowledge.</p>

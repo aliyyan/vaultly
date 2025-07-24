@@ -61,7 +61,9 @@ function ApplyPageContent() {
       assetModel,
       assetCondition,
       estimatedValue,
-      assetDescription,
+      
+      // Dynamic specific fields will be added here as user fills them out
+      // These replace the old general assetDescription field
       
       // Legal Acknowledgments
       saleAcknowledgment: false,
@@ -185,6 +187,30 @@ function ApplyPageContent() {
           { key: 'year', label: 'Year', placeholder: 'Year of manufacture or purchase', required: false },
           { key: 'certificate', label: 'Certificate of Origin', type: 'select', options: ['Yes, have certificate', 'No certificate', 'Not sure'], required: false }
         ]
+      } else if (brandLower.includes('omega')) {
+        return [
+          { key: 'model', label: 'Specific Model', placeholder: 'e.g., Speedmaster, Seamaster, Planet Ocean', required: false },
+          { key: 'referenceNumber', label: 'Reference Number', placeholder: 'Numbers on caseback or warranty card', required: false },
+          { key: 'year', label: 'Year', placeholder: 'Approximate year', required: false },
+          { key: 'movement', label: 'Movement Type', type: 'select', options: ['Automatic', 'Chronograph', 'Quartz', 'Not sure'], required: false },
+          { key: 'boxPapers', label: 'Box & Papers', type: 'select', options: ['Complete set', 'Box only', 'Papers only', 'Watch only'], required: false }
+        ]
+      } else if (brandLower.includes('cartier')) {
+        return [
+          { key: 'model', label: 'Model Name', placeholder: 'e.g., Tank, Santos, Ballon Bleu', required: false },
+          { key: 'size', label: 'Size', placeholder: 'e.g., small, medium, large, or mm measurement', required: false },
+          { key: 'material', label: 'Material', type: 'select', options: ['Stainless Steel', 'Gold', 'Two-tone', 'Leather strap', 'Not sure'], required: false },
+          { key: 'year', label: 'Year', placeholder: 'Approximate year', required: false },
+          { key: 'authenticity', label: 'Authentication', placeholder: 'Certificate, receipt, where purchased', required: false }
+        ]
+      } else if (brandLower.includes('audemars piguet') || brandLower.includes('ap')) {
+        return [
+          { key: 'model', label: 'Model Name', placeholder: 'e.g., Royal Oak, Royal Oak Offshore', required: false },
+          { key: 'referenceNumber', label: 'Reference Number', placeholder: 'Reference number if known', required: false },
+          { key: 'size', label: 'Case Size', placeholder: 'e.g., 41mm, 37mm, 44mm', required: false },
+          { key: 'year', label: 'Year', placeholder: 'Year of manufacture', required: false },
+          { key: 'boxPapers', label: 'Box & Papers', type: 'select', options: ['Complete set', 'Box only', 'Papers only', 'Watch only'], required: false }
+        ]
       }
       // Generic luxury watch questions
       return [
@@ -195,6 +221,32 @@ function ApplyPageContent() {
     }
 
     if (category === "Vehicles") {
+      // Luxury/exotic cars get more detailed questions
+      if (brandLower.includes('ferrari') || brandLower.includes('lamborghini') || brandLower.includes('porsche') || brandLower.includes('mclaren')) {
+        return [
+          { key: 'year', label: 'Year', placeholder: 'e.g., 2020, 2018', required: true },
+          { key: 'mileage', label: 'Mileage', placeholder: 'e.g., 5,000 miles, 12,000 miles', required: true },
+          { key: 'engine', label: 'Engine Details', placeholder: 'e.g., V8, V10, V12, specific displacement', required: false },
+          { key: 'transmission', label: 'Transmission', type: 'select', options: ['Manual', 'Automatic', 'PDK', 'F1', 'Not sure'], required: false },
+          { key: 'vin', label: 'VIN (last 6 digits)', placeholder: 'Last 6 digits for verification', required: false },
+          { key: 'serviceHistory', label: 'Service History', placeholder: 'Dealer service records, major services, etc.', required: false },
+          { key: 'modifications', label: 'Modifications', placeholder: 'Stock, aftermarket parts, performance mods', required: false },
+          { key: 'accidents', label: 'Accident History', type: 'select', options: ['Clean title, no accidents', 'Minor accident', 'Major accident', 'Not sure'], required: false },
+          { key: 'originalMSRP', label: 'Original MSRP', placeholder: 'Original selling price if known', required: false }
+        ]
+      } else if (brandLower.includes('tesla')) {
+        return [
+          { key: 'year', label: 'Year', placeholder: 'e.g., 2023, 2021', required: true },
+          { key: 'mileage', label: 'Mileage', placeholder: 'e.g., 25,000 miles', required: true },
+          { key: 'model', label: 'Specific Model', type: 'select', options: ['Model S', 'Model 3', 'Model X', 'Model Y', 'Cybertruck', 'Roadster'], required: false },
+          { key: 'trim', label: 'Trim Level', placeholder: 'e.g., Long Range, Performance, Plaid', required: false },
+          { key: 'batteryHealth', label: 'Battery Health', placeholder: 'Battery degradation %, range remaining', required: false },
+          { key: 'autopilot', label: 'Autopilot Features', placeholder: 'FSD, Enhanced Autopilot, Basic', required: false },
+          { key: 'vin', label: 'VIN (last 6 digits)', placeholder: 'Last 6 digits', required: false },
+          { key: 'accidents', label: 'Accident History', type: 'select', options: ['Clean title, no accidents', 'Minor accident', 'Major accident', 'Not sure'], required: false }
+        ]
+      }
+      // Regular vehicles
       return [
         { key: 'year', label: 'Year', placeholder: 'e.g., 2020, 2018', required: true },
         { key: 'mileage', label: 'Mileage', placeholder: 'e.g., 45,000 miles, 72,000 km', required: true },
@@ -209,12 +261,41 @@ function ApplyPageContent() {
     if (category === "Designer Handbags") {
       if (brandLower.includes('hermes')) {
         return [
+          { key: 'model', label: 'Model Name', type: 'select', options: ['Birkin', 'Kelly', 'Constance', 'Evelyne', 'Garden Party', 'Other'], required: false },
           { key: 'size', label: 'Size', placeholder: 'e.g., 25cm, 30cm, 35cm', required: false },
-          { key: 'leatherType', label: 'Leather Type', placeholder: 'e.g., Togo, Clemence, Epsom, not sure', required: false },
+          { key: 'leatherType', label: 'Leather Type', placeholder: 'e.g., Togo, Clemence, Epsom, Swift, not sure', required: false },
           { key: 'hardware', label: 'Hardware', type: 'select', options: ['Gold hardware', 'Palladium hardware', 'Rose gold hardware', 'Not sure'], required: false },
-          { key: 'color', label: 'Color', placeholder: 'e.g., black, brown, blue, red', required: false },
+          { key: 'color', label: 'Color', placeholder: 'e.g., black, brown, blue, red, orange', required: false },
           { key: 'dateStamp', label: 'Date Stamp', placeholder: 'Letter stamp inside (e.g., T, U, Y)', required: false },
           { key: 'authenticity', label: 'Authenticity', placeholder: 'Receipt, authentication card, where purchased', required: false }
+        ]
+      } else if (brandLower.includes('chanel')) {
+        return [
+          { key: 'model', label: 'Model Name', placeholder: 'e.g., Classic Flap, Boy Bag, 2.55, Gabrielle', required: false },
+          { key: 'size', label: 'Size', type: 'select', options: ['Small', 'Medium', 'Large', 'Jumbo', 'Mini', 'Not sure'], required: false },
+          { key: 'material', label: 'Material', type: 'select', options: ['Lambskin', 'Caviar leather', 'Patent leather', 'Fabric', 'Not sure'], required: false },
+          { key: 'hardware', label: 'Hardware', type: 'select', options: ['Gold hardware', 'Silver hardware', 'Ruthenium hardware', 'Not sure'], required: false },
+          { key: 'color', label: 'Color', placeholder: 'e.g., black, beige, white, red', required: false },
+          { key: 'serialNumber', label: 'Serial Number', placeholder: 'Serial sticker or authenticity card number', required: false },
+          { key: 'authenticity', label: 'Authenticity', placeholder: 'Authenticity card, receipt, where purchased', required: false }
+        ]
+      } else if (brandLower.includes('louis vuitton') || brandLower.includes('lv')) {
+        return [
+          { key: 'model', label: 'Model Name', placeholder: 'e.g., Neverfull, Speedy, Alma, Pochette Metis', required: false },
+          { key: 'size', label: 'Size', placeholder: 'e.g., PM, MM, GM, or measurements', required: false },
+          { key: 'material', label: 'Material/Canvas', type: 'select', options: ['Monogram Canvas', 'Damier Ebene', 'Damier Azur', 'Epi Leather', 'Not sure'], required: false },
+          { key: 'color', label: 'Color/Pattern', placeholder: 'e.g., classic monogram, damier, black epi', required: false },
+          { key: 'dateCode', label: 'Date Code', placeholder: 'Code inside bag (letters and numbers)', required: false },
+          { key: 'authenticity', label: 'Authenticity', placeholder: 'Receipt, date code location, where purchased', required: false }
+        ]
+      } else if (brandLower.includes('gucci')) {
+        return [
+          { key: 'model', label: 'Model Name', placeholder: 'e.g., Dionysus, Marmont, Soho, Jackie', required: false },
+          { key: 'size', label: 'Size', type: 'select', options: ['Mini', 'Small', 'Medium', 'Large', 'Not sure'], required: false },
+          { key: 'material', label: 'Material', placeholder: 'e.g., GG canvas, leather, suede', required: false },
+          { key: 'color', label: 'Color', placeholder: 'e.g., beige/brown GG, black, red, green', required: false },
+          { key: 'serialNumber', label: 'Serial Number', placeholder: 'Serial number or controllato card', required: false },
+          { key: 'authenticity', label: 'Authenticity', placeholder: 'Receipt, authenticity card, where purchased', required: false }
         ]
       }
       // Generic handbag questions
@@ -246,6 +327,35 @@ function ApplyPageContent() {
             { key: 'year', label: 'Year', placeholder: 'e.g., 2023, 2022, 2020', required: false }
           ]
         }
+      } else if (brandLower.includes('samsung')) {
+        if (modelLower.includes('galaxy') && modelLower.includes('phone')) {
+          return [
+            { key: 'model', label: 'Specific Model', placeholder: 'e.g., Galaxy S24 Ultra, Galaxy S23, Note 20', required: false },
+            { key: 'storage', label: 'Storage Capacity', type: 'select', options: ['128GB', '256GB', '512GB', '1TB', 'Not sure'], required: false },
+            { key: 'carrier', label: 'Carrier Status', type: 'select', options: ['Unlocked', 'Verizon', 'AT&T', 'T-Mobile', 'Sprint', 'Not sure'], required: false },
+            { key: 'color', label: 'Color', placeholder: 'e.g., Phantom Black, Cream, Green', required: false },
+            { key: 'screenCondition', label: 'Screen Condition', type: 'select', options: ['Perfect/no scratches', 'Minor scratches', 'Cracked but functional', 'Screen damaged'], required: false },
+            { key: 'accessories', label: 'Accessories', placeholder: 'Original box, charger, S Pen, etc.', required: false }
+          ]
+        }
+      } else if (brandLower.includes('canon') || brandLower.includes('nikon') || brandLower.includes('sony')) {
+        return [
+          { key: 'model', label: 'Camera Model', placeholder: 'e.g., Canon R5, Nikon D850, Sony A7R V', required: false },
+          { key: 'year', label: 'Year Purchased', placeholder: 'e.g., 2023, 2021, 2019', required: false },
+          { key: 'shutterCount', label: 'Shutter Count', placeholder: 'e.g., 5,000 shots, 25,000 shots, low usage', required: false },
+          { key: 'lenses', label: 'Included Lenses', placeholder: 'e.g., 24-70mm f/2.8, 50mm f/1.4, kit lens', required: false },
+          { key: 'accessories', label: 'Accessories', placeholder: 'Original box, charger, memory cards, case', required: false },
+          { key: 'condition', label: 'Physical Condition', placeholder: 'Body condition, lens condition, any issues', required: false }
+        ]
+      } else if (brandLower.includes('playstation') || brandLower.includes('xbox') || brandLower.includes('nintendo')) {
+        return [
+          { key: 'console', label: 'Console Model', placeholder: 'e.g., PS5, Xbox Series X, Nintendo Switch OLED', required: false },
+          { key: 'storage', label: 'Storage', placeholder: 'e.g., 1TB, 512GB, expanded storage', required: false },
+          { key: 'controllers', label: 'Controllers Included', placeholder: 'Number and condition of controllers', required: false },
+          { key: 'games', label: 'Games Included', placeholder: 'Physical games, digital library details', required: false },
+          { key: 'accessories', label: 'Accessories', placeholder: 'Original box, cables, headset, etc.', required: false },
+          { key: 'condition', label: 'Condition', placeholder: 'Working condition, any issues, cosmetic wear', required: false }
+        ]
       }
       // Generic electronics
       return [
@@ -277,6 +387,47 @@ function ApplyPageContent() {
         { key: 'specificItem', label: 'Specific Item Details', placeholder: 'Exact name, edition, or identifying details', required: false },
         { key: 'condition', label: 'Condition', placeholder: 'Detailed condition description', required: false },
         { key: 'authenticity', label: 'Authentication', placeholder: 'Graded, certified, where obtained', required: false }
+      ]
+    }
+
+    if (category === "Musical Instruments") {
+      if (brandLower.includes('gibson') || brandLower.includes('fender')) {
+        return [
+          { key: 'model', label: 'Guitar Model', placeholder: 'e.g., Les Paul Standard, Stratocaster, Telecaster', required: false },
+          { key: 'year', label: 'Year Made', placeholder: 'e.g., 2020, 1995, 1980s', required: false },
+          { key: 'serialNumber', label: 'Serial Number', placeholder: 'Serial number for authentication', required: false },
+          { key: 'condition', label: 'Condition', placeholder: 'Fret wear, finish condition, electronics working', required: false },
+          { key: 'case', label: 'Case Included', type: 'select', options: ['Hard case included', 'Soft case included', 'No case', 'Not sure'], required: false },
+          { key: 'modifications', label: 'Modifications', placeholder: 'Stock, pickup changes, hardware upgrades', required: false }
+        ]
+      } else if (brandLower.includes('steinway') || brandLower.includes('yamaha') || modelLower.includes('piano')) {
+        return [
+          { key: 'pianoType', label: 'Piano Type', type: 'select', options: ['Grand Piano', 'Upright Piano', 'Digital Piano', 'Keyboard'], required: false },
+          { key: 'size', label: 'Size', placeholder: 'e.g., 6 feet, 7 feet, full size, compact', required: false },
+          { key: 'year', label: 'Year Made', placeholder: 'Approximate year of manufacture', required: false },
+          { key: 'serialNumber', label: 'Serial Number', placeholder: 'Serial number (usually inside)', required: false },
+          { key: 'tuning', label: 'Tuning Condition', placeholder: 'Recently tuned, needs tuning, holds tune well', required: false },
+          { key: 'maintenance', label: 'Maintenance History', placeholder: 'Regular maintenance, recent repairs, etc.', required: false }
+        ]
+      }
+      // Generic instruments
+      return [
+        { key: 'instrumentType', label: 'Instrument Type', placeholder: 'e.g., guitar, violin, trumpet, drums', required: false },
+        { key: 'year', label: 'Age/Year', placeholder: 'How old or year made', required: false },
+        { key: 'condition', label: 'Playing Condition', placeholder: 'How well does it play, any issues', required: false },
+        { key: 'accessories', label: 'Accessories', placeholder: 'Case, bow, mouthpiece, pedals, etc.', required: false }
+      ]
+    }
+
+    if (category === "Fine Jewelry") {
+      return [
+        { key: 'jewelryType', label: 'Type of Jewelry', type: 'select', options: ['Ring', 'Necklace', 'Bracelet', 'Earrings', 'Watch', 'Brooch', 'Other'], required: false },
+        { key: 'metal', label: 'Metal Type', type: 'select', options: ['14k Gold', '18k Gold', '22k Gold', 'Platinum', 'Sterling Silver', 'White Gold', 'Rose Gold', 'Not sure'], required: false },
+        { key: 'gems', label: 'Gemstones', placeholder: 'e.g., 1.5ct diamond, sapphire, ruby, emerald', required: false },
+        { key: 'size', label: 'Size', placeholder: 'e.g., ring size 6, 18-inch necklace, 7-inch bracelet', required: false },
+        { key: 'hallmarks', label: 'Hallmarks/Stamps', placeholder: 'Any stamps, signatures, or markings', required: false },
+        { key: 'certificate', label: 'Certificates', placeholder: 'GIA certificate, appraisal, original receipt', required: false },
+        { key: 'condition', label: 'Condition', placeholder: 'Overall condition, any damage or wear', required: false }
       ]
     }
 
@@ -331,10 +482,7 @@ function ApplyPageContent() {
     
     setSubmitError("") // Clear any previous errors
     
-    // Build comprehensive description from specific answers
-    let detailedDescription = formData.assetDescription || ''
-    
-    // Add specific answers to description
+    // Build comprehensive description from specific dynamic field answers
     const questions = getDynamicQuestions(formData.assetCategory, formData.assetBrand, formData.assetModel)
     const specificAnswers: string[] = []
     
@@ -345,13 +493,10 @@ function ApplyPageContent() {
       }
     })
     
-    if (specificAnswers.length > 0) {
-      if (detailedDescription.trim()) {
-        detailedDescription = specificAnswers.join('. ') + '. Additional details: ' + detailedDescription
-      } else {
-        detailedDescription = specificAnswers.join('. ')
-      }
-    }
+    // Create description from specific answers only
+    const detailedDescription = specificAnswers.length > 0 
+      ? specificAnswers.join('. ')
+      : `${formData.assetBrand} ${formData.assetModel} in ${formData.assetCondition} condition`
     
     // Redirect to quote page with form data as URL parameters
     const urlParams = new URLSearchParams({
@@ -783,39 +928,21 @@ function ApplyPageContent() {
                       ))}
                     </div>
 
-                    {/* Additional Details (Optional) */}
-                    <div className="mt-6">
-                      <Label htmlFor="additionalDetails">
-                        Additional Details (Optional)
-                      </Label>
-                      <Textarea
-                        id="additionalDetails"
-                        value={formData.assetDescription}
-                        onChange={(e) => handleInputChange('assetDescription', e.target.value)}
-                        className="mt-2"
-                        rows={3}
-                        placeholder="Anything else you'd like us to know about your item?"
-                      />
-                    </div>
+                    {/* No additional description box - only specific fields! */}
                   </div>
                 ) : (
-                  <div>
-                    <Label htmlFor="assetDescription">
-                      Item Description
-                    </Label>
-                    <div className="mt-2 mb-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-blue-800 text-sm">
-                        💡 Select your category, brand, and model above to get specific questions for your item
-                      </p>
+                  <div className="mt-4 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg text-center">
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <ArrowRight className="w-5 h-5 text-blue-600" />
+                      <h4 className="font-semibold text-blue-800">Select your item above to get specific questions</h4>
                     </div>
-                    <Textarea
-                      id="assetDescription"
-                      value={formData.assetDescription}
-                      onChange={(e) => handleInputChange('assetDescription', e.target.value)}
-                      className="mt-2"
-                      rows={4}
-                      placeholder="Tell us about your item..."
-                    />
+                    <p className="text-blue-700 text-sm">
+                      Choose your <strong>Category</strong> → <strong>Brand</strong> → <strong>Model</strong> above, 
+                      and we'll show you exactly what information we need in separate fields.
+                    </p>
+                    <p className="text-blue-600 text-xs mt-2">
+                      No more guessing what to write! ✨
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -1114,13 +1241,19 @@ function ApplyPageContent() {
                 <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
                   <p><strong>PARTIES:</strong> This Agreement is between Vaultly, LLC ("Buyer") and {formData.firstName} {formData.lastName} ("Seller").</p>
                   
-                  <p><strong>ASSET DESCRIPTION:</strong></p>
+                  <p><strong>ASSET DETAILS:</strong></p>
                   <ul className="list-disc list-inside ml-4 space-y-1">
                     <li>Type: {formData.assetCategory}</li>
                     <li>Brand: {formData.assetBrand}</li>
                     <li>Model: {formData.assetModel}</li>
                     <li>Condition: {formData.assetCondition}</li>
-                    <li>Description: {formData.assetDescription}</li>
+                    {/* Show specific dynamic field answers */}
+                    {getDynamicQuestions(formData.assetCategory, formData.assetBrand, formData.assetModel).map(question => {
+                      const answer = (formData as any)[question.key]
+                      return answer && answer.trim() ? (
+                        <li key={question.key}>{question.label}: {answer}</li>
+                      ) : null
+                    })}
                   </ul>
 
                   <p><strong>PURCHASE TERMS:</strong></p>
