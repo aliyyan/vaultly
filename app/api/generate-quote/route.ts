@@ -134,134 +134,69 @@ class AssetValuationService {
     return { isValid: true }
   }
 
-  // Enhanced validation for specific details
+  // Smart validation - AI-powered and flexible
   private requiresSpecificDetails(assetData: any): {isValid: boolean, reason?: string} {
     const { assetCategory, assetBrand, assetModel, assetDescription = '' } = assetData
-    const brandLower = assetBrand.toLowerCase()
-    const modelLower = assetModel.toLowerCase()
-    const descLower = assetDescription.toLowerCase()
-
-    // LUXURY WATCHES - Require specific model details
-    if (assetCategory === "Luxury Watches") {
-      if (brandLower.includes('rolex')) {
-        if (modelLower.includes('submariner') && !this.hasRolexSubmarinerDetails(descLower)) {
-          return {
-            isValid: false,
-            reason: "For Rolex Submariner, please specify: Reference number (e.g., 116610LN), year, and whether you have box & papers"
-          }
-        }
-        if (modelLower.includes('datejust') && !this.hasRolexDatejustDetails(descLower)) {
-          return {
-            isValid: false,
-            reason: "For Rolex Datejust, please specify: Reference number (e.g., 126234), size (36mm/41mm), year, and dial color"
-          }
-        }
-        if (modelLower.includes('daytona') && !this.hasRolexDaytonaDetails(descLower)) {
-          return {
-            isValid: false,
-            reason: "For Rolex Daytona, please specify: Reference number (e.g., 116500LN), material (steel/gold), year, and box & papers status"
-          }
-        }
-      }
-      
-      if (brandLower.includes('patek philippe')) {
-        if (!this.hasPatekDetails(descLower)) {
-          return {
-            isValid: false,
-            reason: "For Patek Philippe, please specify: Complete model number (e.g., 5711/1A-010), year, and certificate of origin"
-          }
-        }
+    const fullDescription = `${assetBrand} ${assetModel} ${assetDescription}`.toLowerCase().trim()
+    
+    // Only require more info if the description is genuinely too vague
+    // Our AI is smart enough to extract value from natural language descriptions
+    
+    // Check for extremely minimal descriptions (likely to result in inaccurate quotes)
+    if (fullDescription.length < 10) {
+      return {
+        isValid: false,
+        reason: "Please provide a bit more detail about your item to help us give you an accurate quote"
       }
     }
-
-    // VEHICLES - Require VIN, mileage, service history
-    if (assetCategory === "Vehicles") {
-      if (!this.hasVehicleDetails(descLower)) {
-        return {
-          isValid: false,
-          reason: "For vehicles, please provide: Year, exact mileage, VIN (last 6 digits), engine details, transmission type, and maintenance records"
-        }
+    
+    // Check for obviously fake/test data
+    if (this.isObviouslyFakeInput(fullDescription)) {
+      return {
+        isValid: false,
+        reason: "Please provide genuine information about your item"
       }
     }
-
-    // DESIGNER HANDBAGS - Require authenticity details
-    if (assetCategory === "Designer Handbags") {
-      if (brandLower.includes('hermes') || brandLower.includes('chanel') || brandLower.includes('louis vuitton')) {
-        if (!this.hasHandbagAuthenticityDetails(descLower)) {
-          return {
-            isValid: false,
-            reason: "For luxury handbags, please specify: Size, leather type, hardware color, date code/serial number, and authenticity documentation"
-          }
-        }
+    
+    // Check for major category mismatches (e.g., "iPhone" in "Luxury Watches")
+    if (this.hasMajorCategoryMismatch(assetCategory, fullDescription)) {
+      return {
+        isValid: false,
+        reason: "The item description doesn't match the selected category. Please verify your selection."
       }
     }
-
-    // COLLECTIBLES - Require grading/condition details
-    if (assetCategory === "Collectibles") {
-      if (this.isPokemonCard(assetBrand, assetModel) || this.isSportsCard(assetBrand, assetModel)) {
-        if (!this.hasCardGradingDetails(descLower)) {
-          return {
-            isValid: false,
-            reason: "For trading cards, please specify: Grading company (PSA/BGS/CGC), grade number, set name, and card number"
-          }
-        }
-      }
-    }
-
-    // FINE JEWELRY - Require metal content and gem details
-    if (assetCategory === "Fine Jewelry") {
-      if (!this.hasJewelryDetails(descLower)) {
-        return {
-          isValid: false,
-          reason: "For fine jewelry, please specify: Metal type (14k/18k gold, platinum), gemstone details, carat weight, and any certifications"
-        }
-      }
-    }
-
+    
+    // Everything else is valid - let our AI pricing system handle the details!
     return { isValid: true }
   }
 
-  // Specific validation methods for different categories
-  private hasRolexSubmarinerDetails(description: string): boolean {
-    return /\b(116610|126610|124060|114060)\b/.test(description) && 
-           (/\b(20\d{2}|box|papers)\b/.test(description))
+  private isObviouslyFakeInput(description: string): boolean {
+    const fakePatterns = [
+      /^(test|sample|demo|fake|example)/i,
+      /^([a-z])\1{3,}$/i, // Repeated chars like "aaaa"
+      /^(qwerty|asdf|zxcv|123456)/i,
+      /^[aeiou]{3,}$/i, // All vowels
+      /lorem ipsum/i,
+      /^(.)\1{4,}$/i // 5+ repeated characters
+    ]
+    
+    return fakePatterns.some(pattern => pattern.test(description.trim()))
   }
 
-  private hasRolexDatejustDetails(description: string): boolean {
-    return /\b(126234|126333|16233)\b/.test(description) && 
-           /\b(36mm|41mm)\b/.test(description)
+  private hasMajorCategoryMismatch(category: string, description: string): boolean {
+    const categoryMismatches = {
+      'Luxury Watches': ['iphone', 'samsung', 'laptop', 'car', 'handbag', 'necklace'],
+      'Vehicles': ['watch', 'iphone', 'laptop', 'handbag', 'necklace', 'ring'],
+      'Designer Handbags': ['watch', 'iphone', 'laptop', 'car', 'ring', 'necklace'],
+      'Electronics': ['watch', 'car', 'handbag', 'necklace', 'ring'],
+      'Fine Jewelry': ['watch', 'iphone', 'laptop', 'car', 'handbag']
+    }
+    
+    const mismatches = categoryMismatches[category as keyof typeof categoryMismatches] || []
+    return mismatches.some(mismatch => description.includes(mismatch))
   }
 
-  private hasRolexDaytonaDetails(description: string): boolean {
-    return /\b(116500|126500)\b/.test(description) && 
-           /\b(steel|gold|ceramic)\b/.test(description)
-  }
-
-  private hasPatekDetails(description: string): boolean {
-    return /\b(5711|5712|5726|5164)\b/.test(description) && 
-           /\b(certificate|papers|warranty)\b/.test(description)
-  }
-
-  private hasVehicleDetails(description: string): boolean {
-    return /\b\d{1,3},?\d{3}\s*(miles|km)\b/i.test(description) &&
-           /\b(vin|manual|automatic|transmission)\b/i.test(description) &&
-           /\b(20\d{2}|19\d{2})\b/.test(description)
-  }
-
-  private hasHandbagAuthenticityDetails(description: string): boolean {
-    return /\b(cm|size|small|medium|large)\b/i.test(description) &&
-           /\b(leather|canvas|hardware|serial)\b/i.test(description)
-  }
-
-  private hasCardGradingDetails(description: string): boolean {
-    return /\b(psa|bgs|cgc)\s*\d+(\.\d+)?\b/i.test(description) ||
-           /\b(mint|near mint|excellent|good)\b/i.test(description)
-  }
-
-  private hasJewelryDetails(description: string): boolean {
-    return /\b(14k|18k|platinum|gold|silver)\b/i.test(description) &&
-           /\b(carat|ct|diamond|ruby|sapphire|emerald)\b/i.test(description)
-  }
+  // Old rigid validation methods removed - replaced with flexible AI-powered validation!
 
   // Helper methods for card type detection
   private isPokemonCard(brand: string, model: string): boolean {
