@@ -97,23 +97,16 @@ class AssetValuationService {
       return { isValid: false, reason: "Missing required asset information" }
     }
 
-    // Step 2: Photo validation for high-value items
+    // Step 2: Photo validation - Photos are now optional but recommended
+    // We no longer require photos, but validate quality if provided
     const value = parseFloat(estimatedValue) || 0
-    if (value > 500) {
-      if (!this.hasRequiredPhotos(assetData)) {
-        const minPhotos = this.getMinimumPhotosRequired(assetData)
-        return { 
-          isValid: false, 
-          reason: `INSUFFICIENT_INFO: Please upload 1 clear photo of your item showing overall condition and any visible serial numbers or identifying markings.` 
-        }
-      }
-      
-      // Validate photo quality if photos are provided
-      const photoIssues = this.validatePhotoQuality(assetData.photos || [])
+    const photos = assetData.photos || []
+    if (photos.length > 0) {
+      const photoIssues = this.validatePhotoQuality(photos)
       if (photoIssues.length > 0) {
         return {
           isValid: false,
-          reason: `INSUFFICIENT_INFO: Photo requirements not met: ${photoIssues.join(', ')}`
+          reason: `INSUFFICIENT_INFO: Photo quality issues: ${photoIssues.join(', ')}`
         }
       }
     }
@@ -974,25 +967,17 @@ class AssetValuationService {
            /\b[a-z]?\d{6,}\b/i.test(desc)
   }
 
-  // PHOTO VALIDATION SYSTEM
-  private hasRequiredPhotos(assetData: any): boolean {
-    const photos = assetData.photos || []
-    const minPhotos = this.getMinimumPhotosRequired(assetData)
-    return photos.length >= minPhotos
-  }
-
-  private getMinimumPhotosRequired(assetData: any): number {
-    // Only 1 photo required for all items
-    return 1
-  }
+  // PHOTO VALIDATION SYSTEM - Photos are now optional
 
   private validatePhotoQuality(photos: any[]): string[] {
     const issues: string[] = []
     
-    // Only require that at least 1 photo is uploaded
-    if (photos.length === 0) {
-      issues.push('At least 1 photo is required')
-    }
+    // Photos are now optional - no validation needed
+    // In the future, we could add quality checks here like:
+    // - File size validation
+    // - Image format validation  
+    // - Resolution checks
+    // But for now, any uploaded photos are accepted
     
     return issues
   }
