@@ -143,6 +143,151 @@ function ApplyPageContent() {
     }))
   }
 
+  // Get dynamic questions based on category/brand/model
+  const getDynamicQuestions = (category: string, brand: string, model: string) => {
+    const brandLower = brand.toLowerCase()
+    const modelLower = model.toLowerCase()
+    
+    if (category === "Luxury Watches") {
+      if (brandLower.includes('rolex')) {
+        if (modelLower.includes('submariner')) {
+          return [
+            { key: 'referenceNumber', label: 'Reference Number', placeholder: 'e.g., 116610LN, 126610LV, 124060', required: false },
+            { key: 'year', label: 'Year', placeholder: 'e.g., 2023, 2020, 1990s', required: false },
+            { key: 'boxPapers', label: 'Box & Papers', type: 'select', options: ['Complete set (box & papers)', 'Box only', 'Papers only', 'Watch only'], required: false },
+            { key: 'condition', label: 'Specific Condition Details', placeholder: 'e.g., excellent, minor scratches on bracelet, needs service', required: false }
+          ]
+        } else if (modelLower.includes('datejust')) {
+          return [
+            { key: 'referenceNumber', label: 'Reference Number', placeholder: 'e.g., 126234, 126333, 16233', required: false },
+            { key: 'size', label: 'Size', type: 'select', options: ['36mm', '41mm', 'Not sure'], required: false },
+            { key: 'year', label: 'Year', placeholder: 'e.g., 2023, 2015, 1980s', required: false },
+            { key: 'dialColor', label: 'Dial Color', placeholder: 'e.g., black, white, blue, silver', required: false },
+            { key: 'boxPapers', label: 'Box & Papers', type: 'select', options: ['Complete set (box & papers)', 'Box only', 'Papers only', 'Watch only'], required: false }
+          ]
+        } else if (modelLower.includes('daytona')) {
+          return [
+            { key: 'referenceNumber', label: 'Reference Number', placeholder: 'e.g., 116500LN, 126500LN', required: false },
+            { key: 'material', label: 'Material', type: 'select', options: ['Stainless Steel', 'Gold', 'Two-tone', 'Platinum', 'Not sure'], required: false },
+            { key: 'year', label: 'Year', placeholder: 'e.g., 2023, 2020, 2016', required: false },
+            { key: 'boxPapers', label: 'Box & Papers', type: 'select', options: ['Complete set (box & papers)', 'Box only', 'Papers only', 'Watch only'], required: false }
+          ]
+        }
+        // Generic Rolex questions
+        return [
+          { key: 'referenceNumber', label: 'Reference/Model Number', placeholder: 'Any numbers or letters on the watch', required: false },
+          { key: 'year', label: 'Approximate Year', placeholder: 'When was it made or purchased?', required: false },
+          { key: 'boxPapers', label: 'Box & Papers', type: 'select', options: ['Complete set (box & papers)', 'Box only', 'Papers only', 'Watch only'], required: false }
+        ]
+      } else if (brandLower.includes('patek philippe')) {
+        return [
+          { key: 'modelNumber', label: 'Model Number', placeholder: 'e.g., 5711/1A-010, 5712/1A', required: false },
+          { key: 'year', label: 'Year', placeholder: 'Year of manufacture or purchase', required: false },
+          { key: 'certificate', label: 'Certificate of Origin', type: 'select', options: ['Yes, have certificate', 'No certificate', 'Not sure'], required: false }
+        ]
+      }
+      // Generic luxury watch questions
+      return [
+        { key: 'modelDetails', label: 'Model Details', placeholder: 'Model name, numbers, or any markings', required: false },
+        { key: 'year', label: 'Year', placeholder: 'Approximate age or purchase year', required: false },
+        { key: 'documentation', label: 'Documentation', placeholder: 'Box, papers, warranty, receipt?', required: false }
+      ]
+    }
+
+    if (category === "Vehicles") {
+      return [
+        { key: 'year', label: 'Year', placeholder: 'e.g., 2020, 2018', required: true },
+        { key: 'mileage', label: 'Mileage', placeholder: 'e.g., 45,000 miles, 72,000 km', required: true },
+        { key: 'engine', label: 'Engine', placeholder: 'e.g., V6, 4-cylinder, 2.0L turbo, electric', required: false },
+        { key: 'transmission', label: 'Transmission', type: 'select', options: ['Manual', 'Automatic', 'CVT', 'Not sure'], required: false },
+        { key: 'vin', label: 'VIN (last 6 digits)', placeholder: 'Last 6 digits of VIN for verification', required: false },
+        { key: 'serviceHistory', label: 'Service History', placeholder: 'Regular maintenance, recent repairs, etc.', required: false },
+        { key: 'accidents', label: 'Accident History', type: 'select', options: ['Clean title, no accidents', 'Minor accident', 'Major accident', 'Not sure'], required: false }
+      ]
+    }
+
+    if (category === "Designer Handbags") {
+      if (brandLower.includes('hermes')) {
+        return [
+          { key: 'size', label: 'Size', placeholder: 'e.g., 25cm, 30cm, 35cm', required: false },
+          { key: 'leatherType', label: 'Leather Type', placeholder: 'e.g., Togo, Clemence, Epsom, not sure', required: false },
+          { key: 'hardware', label: 'Hardware', type: 'select', options: ['Gold hardware', 'Palladium hardware', 'Rose gold hardware', 'Not sure'], required: false },
+          { key: 'color', label: 'Color', placeholder: 'e.g., black, brown, blue, red', required: false },
+          { key: 'dateStamp', label: 'Date Stamp', placeholder: 'Letter stamp inside (e.g., T, U, Y)', required: false },
+          { key: 'authenticity', label: 'Authenticity', placeholder: 'Receipt, authentication card, where purchased', required: false }
+        ]
+      }
+      // Generic handbag questions
+      return [
+        { key: 'size', label: 'Size', placeholder: 'e.g., small, medium, large, or measurements', required: false },
+        { key: 'color', label: 'Color', placeholder: 'Primary color of the bag', required: false },
+        { key: 'material', label: 'Material', placeholder: 'e.g., leather, canvas, fabric type', required: false },
+        { key: 'serialNumber', label: 'Serial/Date Code', placeholder: 'Any numbers or codes inside the bag', required: false },
+        { key: 'authenticity', label: 'Authenticity Proof', placeholder: 'Receipt, certificate, where purchased', required: false }
+      ]
+    }
+
+    if (category === "Premium Electronics" || category === "Electronics") {
+      if (brandLower.includes('apple')) {
+        if (modelLower.includes('iphone')) {
+          return [
+            { key: 'storage', label: 'Storage Capacity', type: 'select', options: ['64GB', '128GB', '256GB', '512GB', '1TB'], required: false },
+            { key: 'carrier', label: 'Carrier Status', type: 'select', options: ['Unlocked', 'Verizon', 'AT&T', 'T-Mobile', 'Sprint', 'Not sure'], required: false },
+            { key: 'color', label: 'Color', placeholder: 'e.g., Space Black, Silver, Gold, Blue', required: false },
+            { key: 'batteryHealth', label: 'Battery Health', placeholder: 'e.g., 95%, 82%, excellent, needs replacement', required: false },
+            { key: 'screenCondition', label: 'Screen Condition', type: 'select', options: ['Perfect/no scratches', 'Minor scratches', 'Cracked but functional', 'Screen damaged'], required: false }
+          ]
+        } else if (modelLower.includes('macbook') || modelLower.includes('imac')) {
+          return [
+            { key: 'processor', label: 'Processor', placeholder: 'e.g., M2 chip, M1, Intel i7, i5', required: false },
+            { key: 'ram', label: 'RAM', type: 'select', options: ['8GB', '16GB', '32GB', '64GB', 'Not sure'], required: false },
+            { key: 'storage', label: 'Storage', type: 'select', options: ['256GB SSD', '512GB SSD', '1TB SSD', '2TB SSD', 'Not sure'], required: false },
+            { key: 'screenSize', label: 'Screen Size', placeholder: 'e.g., 13-inch, 15-inch, 16-inch', required: false },
+            { key: 'year', label: 'Year', placeholder: 'e.g., 2023, 2022, 2020', required: false }
+          ]
+        }
+      }
+      // Generic electronics
+      return [
+        { key: 'modelYear', label: 'Model/Year', placeholder: 'Specific model name and year', required: false },
+        { key: 'specifications', label: 'Key Specifications', placeholder: 'Important specs, features, or capabilities', required: false },
+        { key: 'accessories', label: 'Included Accessories', placeholder: 'Charger, cables, case, original box, etc.', required: false }
+      ]
+    }
+
+    if (category === "Collectibles") {
+      if (modelLower.includes('pokemon') || brandLower.includes('pokemon')) {
+        return [
+          { key: 'cardName', label: 'Card Name', placeholder: 'e.g., Charizard, Pikachu, Blastoise', required: false },
+          { key: 'set', label: 'Set', placeholder: 'e.g., Base Set, 1st Edition, Shadowless', required: false },
+          { key: 'cardNumber', label: 'Card Number', placeholder: 'e.g., #4/102, #25/102', required: false },
+          { key: 'grade', label: 'Grade/Condition', placeholder: 'e.g., PSA 10, BGS 9.5, ungraded mint', required: false }
+        ]
+      } else if (brandLower.includes('topps') || brandLower.includes('panini') || modelLower.includes('card')) {
+        return [
+          { key: 'playerName', label: 'Player Name', placeholder: 'e.g., Michael Jordan, Tom Brady', required: false },
+          { key: 'year', label: 'Year', placeholder: 'e.g., 1986, 2000, 2020', required: false },
+          { key: 'cardNumber', label: 'Card Number', placeholder: 'e.g., #57, #23', required: false },
+          { key: 'grade', label: 'Grade/Condition', placeholder: 'e.g., PSA 9, BGS 8.5, raw near mint', required: false },
+          { key: 'rookie', label: 'Rookie Card?', type: 'select', options: ['Yes, rookie card', 'No, not rookie', 'Not sure'], required: false }
+        ]
+      }
+      // Generic collectibles
+      return [
+        { key: 'specificItem', label: 'Specific Item Details', placeholder: 'Exact name, edition, or identifying details', required: false },
+        { key: 'condition', label: 'Condition', placeholder: 'Detailed condition description', required: false },
+        { key: 'authenticity', label: 'Authentication', placeholder: 'Graded, certified, where obtained', required: false }
+      ]
+    }
+
+    // Default questions for other categories
+    return [
+      { key: 'specificDetails', label: 'Specific Details', placeholder: 'Model numbers, serial numbers, key features', required: false },
+      { key: 'age', label: 'Age/Year', placeholder: 'How old is it or when was it made?', required: false },
+      { key: 'condition', label: 'Condition Details', placeholder: 'Detailed condition description', required: false }
+    ]
+  }
+
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -186,6 +331,28 @@ function ApplyPageContent() {
     
     setSubmitError("") // Clear any previous errors
     
+    // Build comprehensive description from specific answers
+    let detailedDescription = formData.assetDescription || ''
+    
+    // Add specific answers to description
+    const questions = getDynamicQuestions(formData.assetCategory, formData.assetBrand, formData.assetModel)
+    const specificAnswers: string[] = []
+    
+    questions.forEach(question => {
+      const answer = (formData as any)[question.key]
+      if (answer && answer.trim()) {
+        specificAnswers.push(`${question.label}: ${answer}`)
+      }
+    })
+    
+    if (specificAnswers.length > 0) {
+      if (detailedDescription.trim()) {
+        detailedDescription = specificAnswers.join('. ') + '. Additional details: ' + detailedDescription
+      } else {
+        detailedDescription = specificAnswers.join('. ')
+      }
+    }
+    
     // Redirect to quote page with form data as URL parameters
     const urlParams = new URLSearchParams({
       firstName: formData.firstName,
@@ -201,7 +368,7 @@ function ApplyPageContent() {
       assetModel: formData.assetModel,
       assetCondition: formData.assetCondition,
       estimatedValue: formData.estimatedValue,
-      assetDescription: formData.assetDescription
+      assetDescription: detailedDescription
     })
     
     window.location.href = `/apply/quote?${urlParams.toString()}`
@@ -568,50 +735,89 @@ function ApplyPageContent() {
                     />
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="assetDescription">
-                    Detailed Description 
-                    {needsMoreInfo && <span className="text-red-500 font-bold"> *Required for accurate quote</span>}
-                  </Label>
-                  
-                  {/* Category-specific guidance */}
-                  {formData.assetCategory && !needsMoreInfo && (
-                    <div className="mt-2 mb-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h4 className="font-semibold text-blue-800 text-sm mb-2">
-                        💡 For the most accurate quote, include:
-                      </h4>
-                      {getCategorySpecificGuidance(formData.assetCategory, formData.assetBrand)}
-                    </div>
-                  )}
-                  
-                  <Textarea
-                    id="assetDescription"
-                    value={formData.assetDescription}
-                    onChange={(e) => handleInputChange('assetDescription', e.target.value)}
-                    className={`mt-2 ${needsMoreInfo ? 'border-red-500 border-2 ring-2 ring-red-200' : ''}`}
-                    rows={needsMoreInfo ? 6 : 4}
-                    placeholder={needsMoreInfo 
-                      ? "Please add the specific details requested for your item (reference numbers, serial numbers, condition details, etc.)"
-                      : getPlaceholderText(formData.assetCategory, formData.assetBrand)
-                    }
-                  />
-                  {needsMoreInfo && (
-                    <div className="mt-2 p-3 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <p className="text-red-700 text-sm font-medium mb-1">
-                            💡 Missing Information Detected
-                          </p>
-                          <p className="text-red-600 text-xs">
-                            Add the specific details shown above to get your accurate quote. 
-                            The more details you provide, the better our AI can price your item.
-                          </p>
-                        </div>
+                {/* Dynamic Questions Section */}
+                {formData.assetCategory && formData.assetBrand && formData.assetModel ? (
+                  <div>
+                    <div className="mb-4 p-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        <h4 className="font-semibold text-emerald-800">Let's get specific details for your {formData.assetBrand} {formData.assetModel}</h4>
                       </div>
+                      <p className="text-emerald-700 text-sm">
+                        Answer the questions below for the most accurate quote. All questions are optional, but more details = better pricing!
+                      </p>
                     </div>
-                  )}
-                </div>
+
+                    <div className="space-y-4">
+                      {getDynamicQuestions(formData.assetCategory, formData.assetBrand, formData.assetModel).map((question, index) => (
+                        <div key={question.key}>
+                          <Label htmlFor={question.key}>
+                            {question.label}
+                            {question.required && <span className="text-red-500 ml-1">*</span>}
+                          </Label>
+                          
+                          {question.type === 'select' ? (
+                            <Select onValueChange={(value) => handleInputChange(question.key, value)}>
+                              <SelectTrigger className="mt-2">
+                                <SelectValue placeholder={`Select ${question.label.toLowerCase()}`} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {question.options?.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              id={question.key}
+                              value={(formData as any)[question.key] || ''}
+                              onChange={(e) => handleInputChange(question.key, e.target.value)}
+                              placeholder={question.placeholder}
+                              className="mt-2"
+                              required={question.required}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Additional Details (Optional) */}
+                    <div className="mt-6">
+                      <Label htmlFor="additionalDetails">
+                        Additional Details (Optional)
+                      </Label>
+                      <Textarea
+                        id="additionalDetails"
+                        value={formData.assetDescription}
+                        onChange={(e) => handleInputChange('assetDescription', e.target.value)}
+                        className="mt-2"
+                        rows={3}
+                        placeholder="Anything else you'd like us to know about your item?"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="assetDescription">
+                      Item Description
+                    </Label>
+                    <div className="mt-2 mb-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-blue-800 text-sm">
+                        💡 Select your category, brand, and model above to get specific questions for your item
+                      </p>
+                    </div>
+                    <Textarea
+                      id="assetDescription"
+                      value={formData.assetDescription}
+                      onChange={(e) => handleInputChange('assetDescription', e.target.value)}
+                      className="mt-2"
+                      rows={4}
+                      placeholder="Tell us about your item..."
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
 
