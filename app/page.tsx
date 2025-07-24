@@ -89,7 +89,7 @@ export default function HomePage() {
     {
       number: "01",
       title: "Get Your Quote",
-      description: "Upload photos and details of your luxury item. Get an instant cash offer in minutes.",
+      description: "Share details about your luxury item. Photos are recommended for more accurate quotes, but not required. Get an instant cash offer in minutes.",
       image: "/process-step1.png",
       icon: Camera
     },

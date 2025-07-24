@@ -34,8 +34,8 @@ export default function HowItWorksPage() {
                   </div>
                   <h3 className="font-bold text-2xl">Submit Your Item Online</h3>
                   <p className="text-gray-600 mt-2">
-                    Use our simple online form to tell us about your valuable. You'll describe the item, its condition,
-                    and upload a few photos. This initial step takes just a few minutes and provides our experts with
+                    Use our simple online form to tell us about your valuable. You'll describe the item and its condition.
+                    Photos are highly recommended for more accurate quotes but not required. This initial step takes just a few minutes and provides our experts with
                     the information they need to give you a preliminary offer.
                   </p>
                 </div>

@@ -616,38 +616,40 @@ function ApplyPageContent() {
             </Card>
 
             {/* Photo Upload Section */}
-            {parseFloat(formData.estimatedValue) > 500 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Camera className="h-5 w-5 text-blue-600" />
-                    Item Photo Required
-                    <Badge className="bg-blue-600">Required</Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <Camera className="h-5 w-5 text-blue-600 mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-blue-800 mb-2">Photo Requirement</p>
-                        <p className="text-blue-700 mb-2">
-                          Please upload <strong>1 clear photo</strong> of your item showing:
-                        </p>
-                        <ul className="list-disc list-inside space-y-1 text-blue-700">
-                          <li>Overall condition and authenticity</li>
-                          <li>Any serial numbers, model markings, or signatures (if visible)</li>
-                          <li>Key identifying features</li>
-                        </ul>
-                      </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5 text-emerald-600" />
+                  Item Photos
+                  <Badge variant="outline" className="border-emerald-500 text-emerald-700">Highly Suggested</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <Camera className="h-5 w-5 text-emerald-600 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium text-emerald-800 mb-2">📸 Photos Highly Recommended</p>
+                      <p className="text-emerald-700 mb-2">
+                        While photos aren't required, uploading <strong>1-3 clear photos</strong> helps us provide more accurate quotes. Show:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 text-emerald-700">
+                        <li>Overall condition and authenticity</li>
+                        <li>Any serial numbers, model markings, or signatures (if visible)</li>
+                        <li>Key identifying features</li>
+                      </ul>
+                      <p className="text-emerald-600 text-xs mt-2 font-medium">
+                        💡 Items with photos typically receive quotes 15-20% more accurate than description alone
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-emerald-400 transition-colors">
                     <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-lg font-medium text-gray-600 mb-2">Upload Your Item Photo</p>
+                    <p className="text-lg font-medium text-gray-600 mb-2">Upload Your Item Photos (Optional)</p>
                     <p className="text-sm text-gray-500 mb-4">
-                      Click to select a file or drag and drop an image here
+                      Click to select files or drag and drop images here
                     </p>
                     <input
                       type="file"
@@ -668,29 +670,28 @@ function ApplyPageContent() {
                       type="button"
                       variant="outline" 
                       onClick={() => document.getElementById('photo-upload')?.click()}
-                      className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                      className="border-emerald-300 text-emerald-600 hover:bg-emerald-50"
                     >
-                      Select Photo
+                      Select Photos
                     </Button>
                     <div className="mt-3 text-xs text-gray-400">
-                      Supported formats: JPG, PNG, HEIC • Max 10MB per file
+                      Supported formats: JPG, PNG, HEIC • Max 10MB per file • 1-3 photos recommended
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <Shield className="h-5 w-5 text-emerald-600 mt-0.5" />
                       <div className="text-sm">
-                        <p className="font-medium text-blue-800 mb-1">Photo Security & Privacy</p>
-                        <p className="text-blue-700">
-                          Your photo is encrypted and only used for valuation purposes. It is automatically deleted after 30 days unless you complete a transaction.
+                        <p className="font-medium text-emerald-800 mb-1">Photo Security & Privacy</p>
+                        <p className="text-emerald-700">
+                          Your photos are encrypted and only used for valuation purposes. They are automatically deleted after 30 days unless you complete a transaction.
                         </p>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            )}
 
             {/* Submit Button */}
             <div className="text-center space-y-4">
